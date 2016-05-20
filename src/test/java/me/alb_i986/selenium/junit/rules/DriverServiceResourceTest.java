@@ -38,7 +38,7 @@ public class DriverServiceResourceTest {
     public void nullArgShouldNotBeAllowed() {
         try {
             new DriverServiceResource(null);
-            fail("null arg should not be allowed");
+            fail("null DriverService should not be allowed");
         } catch (IllegalArgumentException e) {
             // expected
         }

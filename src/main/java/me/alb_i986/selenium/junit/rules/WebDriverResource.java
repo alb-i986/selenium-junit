@@ -22,7 +22,7 @@ public class WebDriverResource extends ExternalResource {
 
     public WebDriverResource(WebDriverFactory driverFactory) {
         if (driverFactory == null) {
-            throw new IllegalArgumentException("the arg should not be null");
+            throw new IllegalArgumentException("the WebDriverFactory should not be null");
         }
         this.driverFactory = driverFactory;
     }
