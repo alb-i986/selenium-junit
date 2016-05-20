@@ -50,7 +50,8 @@ public class WebDriverResourceTest {
 
     @Test
     public void afterShouldQuitTheDriver() {
-        WebDriverResource sut = new WebDriverResource(mockedDriver);
+        WebDriverResource sut = new WebDriverResource(new DummyDriverFactory());
+        sut.setDriver(mockedDriver);
 
         // when
         sut.after();
