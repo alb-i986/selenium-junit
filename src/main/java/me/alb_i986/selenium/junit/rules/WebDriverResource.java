@@ -57,11 +57,4 @@ public class WebDriverResource extends ExternalResource {
     public WebDriver getDriver() {
         return driver;
     }
-
-    /**
-     * To be used by unit tests only!
-     */
-    void setDriver(WebDriver driver) {
-        this.driver = driver;
-    }
 }
