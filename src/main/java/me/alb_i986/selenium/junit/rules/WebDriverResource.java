@@ -33,6 +33,8 @@ public class WebDriverResource extends ExternalResource {
      * Creates a new driver with the given {@link WebDriverFactory}.
      *
      * @throws WebDriverException if the {@link WebDriverFactory} returns a null driver
+     *
+     * @see WebDriverFactory#create()
      */
     @Override
     protected void before() throws Throwable {
