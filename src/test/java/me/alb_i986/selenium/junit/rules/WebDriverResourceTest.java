@@ -62,7 +62,7 @@ public class WebDriverResourceTest {
     @Test
     public void nullArgsInConstructorShouldNotBeAllowed() {
         try {
-            new WebDriverResource(null);
+            new WebDriverResource(((WebDriverFactory) null));
             fail("null arg should not be allowed");
         } catch (IllegalArgumentException e) {
             // expected
