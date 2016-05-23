@@ -27,6 +27,15 @@ public class WebDriverResource extends ExternalResource {
     private final WebDriverFactory driverFactory;
     private WebDriver driver;
 
+    public WebDriverResource(final WebDriver driver) {
+        this(new WebDriverFactory() {
+            @Override
+            public WebDriver create() {
+                return driver;
+            }
+        });
+    }
+
     public WebDriverResource(WebDriverFactory driverFactory) {
         if (driverFactory == null) {
             throw new IllegalArgumentException("The WebDriverFactory should not be null");
