@@ -8,7 +8,7 @@
     <artifactId>selenium-junit</artifactId>
     <version>1.0-SNAPSHOT</version>
     <description>A framework for writing maintainable poetry with Selenium WebDriver.</description>
-    <url>http://alb-i986.github.io/selenium-tinafw/</url>
+    <url>https://github.com/alb-i986/selenium-junit4</url>
 
     <licenses>
         <license>
@@ -21,6 +21,8 @@
         <developer>
             <name>Alberto Scotto</name>
             <email>scotto.alberto.86@gmail.com</email>
+            <id>alb-i986</id>
+            <url>http://alb-i986.me</url>
         </developer>
     </developers>
     
