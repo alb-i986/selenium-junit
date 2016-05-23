@@ -6,11 +6,21 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 /**
- * A {@link org.junit.Rule} managing {@link WebDriver} instances during testruns,
+ * A {@link org.junit.rules.TestRule} managing {@link WebDriver} instances during testruns,
  * i.e. opening and closing real browsers.
  * <p>
  * Before a test starts, a new {@link WebDriver} is created. The actual creation of the driver is delegated to a {@link WebDriverFactory}.
  * After a test terminates, the driver is quit.
+ * <p>
+ * Not thread safe. This shouldn't be an issue, as long as every test gets a new instance of the rule.
+ * Example of correct usage:
+ *
+ * <pre>
+ * public class MyTest {
+ *     &#064;Rule
+ *     public TestRule rule = new WebDriverResource(new MyDriverFactory());
+ * }
+ * </pre>
  */
 public class WebDriverResource extends ExternalResource {
 
