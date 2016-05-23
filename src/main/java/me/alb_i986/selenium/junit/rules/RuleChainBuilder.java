@@ -1,10 +1,12 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.RuleChain;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
+
+import me.alb_i986.selenium.WebDriverFactory;
 
 /**
  * @author ascotto
@@ -29,7 +31,7 @@ public class RuleChainBuilder {
         return this;
     }
 
-    public RuleChain build() {
+    public SeleniumRuleChain build() {
         RuleChain ruleChain = RuleChain.outerRule(driverResource);
         if (takeScreenshotOnFailureRule != null) {
             ruleChain.around(takeScreenshotOnFailureRule);
@@ -37,6 +39,11 @@ public class RuleChainBuilder {
         if (testLogger != null) {
             ruleChain.around(testLogger);
         }
-        return ruleChain;
+        return new SeleniumRuleChain(ruleChain) {
+            @Override
+            public WebDriver getDriver() {
+                return driverResource.getDriver();
+            }
+        };
     }
 }
