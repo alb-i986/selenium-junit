@@ -1,9 +1,8 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.BaseMockitoTestClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openqa.selenium.remote.service.DriverService;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -11,8 +10,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
-public class DriverServiceResourceTest {
+public class DriverServiceResourceTest extends BaseMockitoTestClass {
 
     @Mock private DriverService mockedService;
 

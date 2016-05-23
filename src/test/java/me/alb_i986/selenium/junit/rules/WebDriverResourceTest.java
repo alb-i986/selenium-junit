@@ -1,12 +1,11 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.BaseMockitoTestClass;
 import me.alb_i986.selenium.DummyDriver;
 import me.alb_i986.selenium.DummyDriverFactory;
 import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
@@ -18,8 +17,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
-public class WebDriverResourceTest {
+public class WebDriverResourceTest extends BaseMockitoTestClass {
 
     @Mock private WebDriverFactory mockedDriverFactory;
     @Mock private WebDriver mockedDriver;
