@@ -5,32 +5,27 @@ import org.junit.rules.ExternalResource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
+/**
+ * A {@link org.junit.Rule} managing {@link WebDriver} instances during testruns,
+ * i.e. opening and closing real browsers.
+ * <p>
+ * Before a test starts, a new {@link WebDriver} is created. The actual creation of the driver is delegated to a {@link WebDriverFactory}.
+ * After a test terminates, the driver is quit.
+ */
 public class WebDriverResource extends ExternalResource {
 
     private final WebDriverFactory driverFactory;
     private WebDriver driver;
 
-    public WebDriverResource(final WebDriver driver) {
-        this(new WebDriverFactory() {
-                 @Override
-                 public WebDriver create() {
-                     return driver;
-                 }
-             }
-        );
-    }
-
     public WebDriverResource(WebDriverFactory driverFactory) {
         if (driverFactory == null) {
-            throw new IllegalArgumentException("the WebDriverFactory should not be null");
+            throw new IllegalArgumentException("The WebDriverFactory should not be null");
         }
         this.driverFactory = driverFactory;
     }
 
     /**
-     * Opens a browser.
-     * <p>
-     * Creates a new driver with the given {@link WebDriverFactory}.
+     * Creates a new driver by using the given {@link WebDriverFactory}.
      *
      * @throws WebDriverException if the {@link WebDriverFactory} returns a null driver
      *
@@ -47,7 +42,7 @@ public class WebDriverResource extends ExternalResource {
     }
 
     /**
-     * Closes the browser
+     * Quits the driver.
      *
      * @see WebDriver#quit()
      */

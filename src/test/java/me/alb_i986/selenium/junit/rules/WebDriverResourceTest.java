@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
@@ -23,6 +25,17 @@ public class WebDriverResourceTest {
     @Mock private WebDriver mockedDriver;
 
     @Test
+    public void nullDriverFactoryInConstructorShouldNotBeAllowed() {
+        try {
+            new WebDriverResource(null);
+            fail("null WebDriverFactory in constructor should not be allowed");
+        } catch (IllegalArgumentException e) {
+            // expected
+            assertThat(e.getMessage(), equalTo("The WebDriverFactory should not be null"));
+        }
+    }
+
+    @Test
     public void beforeShouldCreateNewDriver() throws Throwable {
         WebDriver dummyDriver = new DummyDriver();
         given(mockedDriverFactory.create()).willReturn(dummyDriver);
@@ -32,7 +45,7 @@ public class WebDriverResourceTest {
         sut.before();
 
         verify(mockedDriverFactory).create();
-        assertThat(sut.getDriver(), equalTo(dummyDriver));
+        assertThat(sut.getDriver(), sameInstance(dummyDriver));
     }
 
     @Test
@@ -42,9 +55,10 @@ public class WebDriverResourceTest {
 
         try {
             sut.before();
-            fail("Should Throw When Factory Returns Null Driver");
+            fail("before() should throw when factory returns null driver");
         } catch (WebDriverException e) {
             // expected
+            assertThat(e.getMessage(), startsWith("WebDriverFactory failed creating a new driver"));
         }
     }
 
@@ -57,15 +71,5 @@ public class WebDriverResourceTest {
         sut.after();
 
         verify(mockedDriver).quit();
-    }
-
-    @Test
-    public void nullArgsInConstructorShouldNotBeAllowed() {
-        try {
-            new WebDriverResource(((WebDriverFactory) null));
-            fail("null arg should not be allowed");
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
     }
 }

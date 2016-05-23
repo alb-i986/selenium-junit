@@ -17,10 +17,6 @@ public class RuleChainBuilder {
     private TakeScreenshotOnFailureRule takeScreenshotOnFailureRule;
     private TestLoggerRule testLogger;
 
-    public RuleChainBuilder(WebDriver driver) {
-        this.driverResource = new WebDriverResource(driver);
-    }
-
     public RuleChainBuilder(WebDriverFactory factory) {
         this.driverResource = new WebDriverResource(factory);
     }
