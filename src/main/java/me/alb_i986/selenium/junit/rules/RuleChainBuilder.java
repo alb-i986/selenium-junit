@@ -3,8 +3,6 @@ package me.alb_i986.selenium.junit.rules;
 import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.RuleChain;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
 
@@ -27,11 +25,7 @@ public class RuleChainBuilder {
     }
 
     public <X> RuleChainBuilder takeScreenshotOnFailure(OutputType<X> outputType) {
-        WebDriver driver = driverResource.getDriver();
-        if (!(driver instanceof TakesScreenshot)) {
-            throw new IllegalStateException("the driver is not able to take screenshots");
-        }
-        this.takeScreenshotOnFailureRule = new TakeScreenshotOnFailureRule(((TakesScreenshot) driver), outputType);
+        this.takeScreenshotOnFailureRule = new TakeScreenshotOnFailureRule(driverResource.getDriver(), outputType);
         return this;
     }
 

@@ -4,20 +4,25 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 
 /**
- * @author ascotto
+ * A {@link org.junit.rules.TestRule} taking a screenshot in case of test failure.
  */
 public class TakeScreenshotOnFailureRule<X> extends TestWatcher {
 
     private final TakesScreenshot driver;
     private final OutputType<X> outputType;
 
-    public TakeScreenshotOnFailureRule(TakesScreenshot driver, OutputType<X> outputType) {
-        if (driver == null) {
-            throw new IllegalArgumentException("the driver should not be null");
+    // TODO rather than OutputType, should probably take a TestReporter or something..
+    public TakeScreenshotOnFailureRule(WebDriver driver, OutputType<X> outputType) {
+        if (driver == null || outputType == null) {
+            throw new IllegalArgumentException("The arguments should not be null");
         }
-        this.driver = driver;
+        if (!(driver instanceof TakesScreenshot)) {
+            throw new IllegalArgumentException("The driver cannot take screenshots: it's not of type TakesScreenshot");
+        }
+        this.driver = (TakesScreenshot) driver;
         this.outputType = outputType;
     }
 
@@ -27,5 +32,6 @@ public class TakeScreenshotOnFailureRule<X> extends TestWatcher {
     @Override
     protected void failed(Throwable e, Description description) {
         X screenshot = driver.getScreenshotAs(outputType);
+        // TODO do something with screenshot
     }
 }
