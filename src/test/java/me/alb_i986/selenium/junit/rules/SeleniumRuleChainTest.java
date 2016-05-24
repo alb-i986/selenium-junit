@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class RuleChainBuilderTest {
+public class SeleniumRuleChainTest {
 
     @Test
     public void integrationTest() {
@@ -26,7 +26,7 @@ public class RuleChainBuilderTest {
 
     public static class TestClassWithMinimalSeleniumRuleChain {
         @Rule
-        public SeleniumRuleChain ruleChain = new RuleChainBuilder(new MockedDriverFactory()).build();
+        public SeleniumRuleChain ruleChain = new SeleniumRuleChain.Builder(new MockedDriverFactory()).build();
 
         protected WebDriver driver() {
             return ruleChain.getDriver();
