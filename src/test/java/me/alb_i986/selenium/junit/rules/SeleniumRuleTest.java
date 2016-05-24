@@ -1,19 +1,37 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.MockedDriverFactory;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
+import org.junit.runners.model.Statement;
 import org.openqa.selenium.WebDriver;
 
-import me.alb_i986.selenium.MockedDriverFactory;
+import java.util.logging.Logger;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class SeleniumRuleChainTest {
+public class SeleniumRuleTest {
+
+    @Test
+    public void rulesCanUseTheDriverInitializedByWebDriverResource() throws Throwable {
+        SeleniumRule sut = SeleniumRule.builder(new MockedDriverFactory())
+                .appendRule(new TestLoggerRule(Logger.getLogger("asd")))
+                .build();
+        Statement s = sut.apply(new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+
+                System.out.println("test running");
+            }
+        }, Description.EMPTY);
+        s.evaluate();
+    }
 
     @Test
     public void integrationTest() {
@@ -26,10 +44,10 @@ public class SeleniumRuleChainTest {
 
     public static class TestClassWithMinimalSeleniumRuleChain {
         @Rule
-        public SeleniumRuleChain ruleChain = new SeleniumRuleChain.Builder(new MockedDriverFactory()).build();
+        public SeleniumRule seleniumRule = SeleniumRule.builder(new MockedDriverFactory()).build();
 
         protected WebDriver driver() {
-            return ruleChain.getDriver();
+            return seleniumRule.getDriver();
         }
 
         @Test

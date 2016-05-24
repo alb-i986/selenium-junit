@@ -1,5 +1,6 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -7,20 +8,31 @@ import org.junit.runners.model.Statement;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
-
-import me.alb_i986.selenium.WebDriverFactory;
 
 /**
  * A {@link RuleChain} providing access to a {@link WebDriver}.
  * <p>
- * Use {@link Builder} to instantiate.
+ * Use {@link #builder(WebDriverFactory)} to instantiate.
  */
-public abstract class SeleniumRuleChain implements TestRule {
+public abstract class SeleniumRule implements TestRule {
 
     private final RuleChain ruleChain;
 
-    protected SeleniumRuleChain(RuleChain ruleChain) {
+    /**
+     * @param factory the factory to use to create {@link WebDriver} instances before a test starts
+     */
+    public static Builder builder(WebDriverFactory factory) {
+        return new Builder(factory);
+    }
+
+    /**
+     * Please use {@link #builder(WebDriverFactory)} instead,
+     * to instantiate.
+     */
+    protected SeleniumRule(RuleChain ruleChain) {
         if (ruleChain == null) {
             throw new IllegalArgumentException("RuleChain should not be null");
         }
@@ -34,13 +46,14 @@ public abstract class SeleniumRuleChain implements TestRule {
 
     public abstract WebDriver getDriver();
 
-    public class Builder {
+    public static class Builder {
 
         private final WebDriverResource driverResource;
         private TakeScreenshotOnFailureRule screenshotOnFailureRule;
         private TestLoggerRule testLogger;
+        private Set<TestRule> otherRules = new HashSet<>();
 
-        public Builder(WebDriverFactory factory) {
+        private Builder(WebDriverFactory factory) {
             this.driverResource = new WebDriverResource(factory);
         }
 
@@ -51,22 +64,35 @@ public abstract class SeleniumRuleChain implements TestRule {
 
         public <X> Builder takeScreenshotOnFailure(OutputType<X> outputType) {
             this.screenshotOnFailureRule = new TakeScreenshotOnFailureRule(
-                    driverResource.getDriver(), outputType);
+                    driverResource, outputType);
             return this;
         }
 
-        public SeleniumRuleChain build() {
-            RuleChain ruleChain = RuleChain.outerRule(driverResource);
-            if (screenshotOnFailureRule != null) {
-                ruleChain.around(screenshotOnFailureRule);
-            }
+        /**
+         * To be used by unit tests only!
+         */
+        Builder appendRule(TestRule otherRule) {
+            otherRules.add(otherRule);
+            return this;
+        }
+
+        public SeleniumRule build() {
+            RuleChain ruleChain;
             if (testLogger != null) {
-                ruleChain.around(testLogger);
+                ruleChain = RuleChain.outerRule(testLogger);
+            } else {
+                ruleChain = RuleChain.outerRule(driverResource);
             }
-            return new SeleniumRuleChain(ruleChain) {
+            if (screenshotOnFailureRule != null) {
+                ruleChain = ruleChain.around(screenshotOnFailureRule);
+            }
+            for (TestRule otherRule : otherRules) {
+                ruleChain = ruleChain.around(otherRule);
+            }
+            return new SeleniumRule(ruleChain) {
                 @Override
                 public WebDriver getDriver() {
-                    return driverResource.getDriver();
+                    return driverResource.getWrappedDriver();
                 }
             };
         }

@@ -24,8 +24,9 @@ public class WebDriverResourceTest extends BaseMockitoTestClass {
 
     @Test
     public void nullDriverFactoryInConstructorShouldNotBeAllowed() {
+        WebDriverFactory nullFactory = null;
         try {
-            new WebDriverResource(null);
+            new WebDriverResource(nullFactory);
             fail("null WebDriverFactory in constructor should not be allowed");
         } catch (IllegalArgumentException e) {
             // expected
@@ -43,7 +44,7 @@ public class WebDriverResourceTest extends BaseMockitoTestClass {
         sut.before();
 
         verify(mockedDriverFactory).create();
-        assertThat(sut.getDriver(), sameInstance(dummyDriver));
+        assertThat(sut.getWrappedDriver(), sameInstance(dummyDriver));
     }
 
     @Test

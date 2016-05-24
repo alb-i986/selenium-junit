@@ -10,6 +10,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.internal.WrapsDriver;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -82,5 +83,5 @@ public class TakeScreenshotOnFailureRuleTest extends BaseMockitoTestClass {
         }
     }
 
-    private interface WebDriverTakingScreenshot extends WebDriver, TakesScreenshot {}
+    private interface WebDriverTakingScreenshot extends WebDriver, TakesScreenshot, WrapsDriver {}
 }
