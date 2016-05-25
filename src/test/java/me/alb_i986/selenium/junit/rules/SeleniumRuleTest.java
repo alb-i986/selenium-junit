@@ -8,13 +8,20 @@ import org.junit.runner.Result;
 import org.junit.runners.model.Statement;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.logging.Logger;
 
 import me.alb_i986.junit.SimulatedTestFailure;
 import me.alb_i986.selenium.MockedDriverFactory;
+import me.alb_i986.selenium.WebDriverFactory;
 import me.alb_i986.selenium.WebDriverProvider;
 
 import static me.alb_i986.junit.Descriptions.descriptionForFlakyTest;
@@ -102,6 +109,37 @@ public class SeleniumRuleTest {
         @Test
         public void secondTest() {
             assertNotNull(driver());
+        }
+    }
+
+    public static class RealSeleniumTest {
+        @Rule
+        public SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
+                .withTestLogger(Logger.getLogger("my.logger"))
+                .toTakeScreenshotOnFailure(OutputType.BASE64)
+                .build();
+
+        protected WebDriver driver() {
+            return seleniumRule.getDriver();
+        }
+
+        @Test
+        public void passingTest() {
+            driver().get("http://www.google.com");
+            driver().findElement(By.name("q")).sendKeys("selenium-junit" + Keys.ENTER);
+            new WebDriverWait(driver(), 5).until(ExpectedConditions.titleContains("selenium-junit"));
+        }
+
+        @Test
+        public void failingTest() {
+            throw new WebDriverException("simulates a failing test");
+        }
+
+        private static class ChromeDriverFactory implements WebDriverFactory {
+            @Override
+            public WebDriver create() {
+                return new ChromeDriver();
+            }
         }
     }
 }
