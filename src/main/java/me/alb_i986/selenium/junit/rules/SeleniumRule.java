@@ -1,6 +1,5 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -8,14 +7,13 @@ import org.junit.runners.model.Statement;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
+import me.alb_i986.selenium.WebDriverFactory;
+
 /**
- * A {@link RuleChain} providing access to a {@link WebDriver}.
- * <p>
- * Use {@link #builder(WebDriverFactory)} to instantiate.
+ * A {@link RuleChain} providing access to a {@link WebDriver}. <p> Use {@link
+ * #builder(WebDriverFactory)} to instantiate.
  */
 public abstract class SeleniumRule implements TestRule {
 
@@ -29,8 +27,7 @@ public abstract class SeleniumRule implements TestRule {
     }
 
     /**
-     * Please use {@link #builder(WebDriverFactory)} instead,
-     * to instantiate.
+     * Please use {@link #builder(WebDriverFactory)} instead, to instantiate.
      */
     protected SeleniumRule(RuleChain ruleChain) {
         if (ruleChain == null) {
@@ -51,43 +48,41 @@ public abstract class SeleniumRule implements TestRule {
         private final WebDriverResource driverResource;
         private TakeScreenshotOnFailureRule screenshotOnFailureRule;
         private TestLoggerRule testLogger;
-        private Set<TestRule> otherRules = new HashSet<>();
 
         private Builder(WebDriverFactory factory) {
-            this.driverResource = new WebDriverResource(factory);
+            this(new WebDriverResource(factory));
+        }
+
+        protected Builder(WebDriverResource driverResource) {
+            this.driverResource = driverResource;
         }
 
         public Builder withTestLogger(Logger logger) {
-            this.testLogger = new TestLoggerRule(logger);
+            return withTestLogger(new TestLoggerRule(logger));
+        }
+
+        protected Builder withTestLogger(TestLoggerRule loggerRule) {
+            this.testLogger = loggerRule;
             return this;
         }
 
         public <X> Builder takeScreenshotOnFailure(OutputType<X> outputType) {
-            this.screenshotOnFailureRule = new TakeScreenshotOnFailureRule(
-                    driverResource, outputType);
-            return this;
+            return takeScreenshotOnFailure(new TakeScreenshotOnFailureRule(driverResource, outputType));
         }
 
-        /**
-         * To be used by unit tests only!
-         */
-        Builder appendRule(TestRule otherRule) {
-            otherRules.add(otherRule);
+        protected <X> Builder takeScreenshotOnFailure(TakeScreenshotOnFailureRule<X> takeScreenshotOnFailureRule) {
+            this.screenshotOnFailureRule = takeScreenshotOnFailureRule;
             return this;
         }
 
         public SeleniumRule build() {
-            RuleChain ruleChain;
+            RuleChain ruleChain = RuleChain.emptyRuleChain();
             if (testLogger != null) {
-                ruleChain = RuleChain.outerRule(testLogger);
-            } else {
-                ruleChain = RuleChain.outerRule(driverResource);
+                ruleChain = ruleChain.around(testLogger);
             }
+            ruleChain = ruleChain.around(driverResource);
             if (screenshotOnFailureRule != null) {
                 ruleChain = ruleChain.around(screenshotOnFailureRule);
-            }
-            for (TestRule otherRule : otherRules) {
-                ruleChain = ruleChain.around(otherRule);
             }
             return new SeleniumRule(ruleChain) {
                 @Override

@@ -4,6 +4,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.internal.WrapsDriver;
 
 /**
@@ -11,18 +12,15 @@ import org.openqa.selenium.internal.WrapsDriver;
  */
 public class TakeScreenshotOnFailureRule<X> extends TestWatcher {
 
-    private final TakesScreenshot driver;
+    private final WrapsDriver driverWrapper;
     private final OutputType<X> outputType;
 
     // TODO rather than OutputType, should probably take a TestReporter or something..
-    public TakeScreenshotOnFailureRule(WrapsDriver driver, OutputType<X> outputType) {
-        if (driver == null || outputType == null) {
+    public TakeScreenshotOnFailureRule(WrapsDriver driverWrapper, OutputType<X> outputType) {
+        if (driverWrapper == null || outputType == null) {
             throw new IllegalArgumentException("The arguments should not be null");
         }
-        if (!(driver instanceof TakesScreenshot)) {
-            throw new IllegalArgumentException("The driver cannot take screenshots: it's not of type TakesScreenshot");
-        }
-        this.driver = (TakesScreenshot) driver;
+        this.driverWrapper = driverWrapper;
         this.outputType = outputType;
     }
 
@@ -31,7 +29,11 @@ public class TakeScreenshotOnFailureRule<X> extends TestWatcher {
      */
     @Override
     protected void failed(Throwable e, Description description) {
-        X screenshot = driver.getScreenshotAs(outputType);
-        // TODO do something with screenshot
+        WebDriver driver = driverWrapper.getWrappedDriver();
+        if (driver instanceof TakesScreenshot) {
+            X screenshot = ((TakesScreenshot) driver).getScreenshotAs(outputType);
+            System.out.println(screenshot);
+            // TODO do something with screenshot
+        } // TODO else report that the screenshot was not taken because blahblah
     }
 }
