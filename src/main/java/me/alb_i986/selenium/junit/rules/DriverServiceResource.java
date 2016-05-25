@@ -4,9 +4,8 @@ import org.junit.rules.ExternalResource;
 import org.openqa.selenium.remote.service.DriverService;
 
 /**
- * A {@link org.junit.rules.TestRule} managing {@link DriverService} instances.
- * <p>
- * The {@link DriverService} is started on test start, and stopped on test termination.
+ * A {@link org.junit.rules.TestRule} managing {@link DriverService} instances,
+ * i.e. starting and stopping services.
  * <p>
  * This rule is typically used as a {@link org.junit.ClassRule}.
  */

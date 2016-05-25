@@ -1,9 +1,6 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.BaseMockitoTestClass;
-import me.alb_i986.selenium.DummyDriver;
 import me.alb_i986.selenium.MockedDriverFactory;
-import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -11,7 +8,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runners.model.Statement;
 import org.mockito.InOrder;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
@@ -25,22 +22,20 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-public class SeleniumRuleTest extends BaseMockitoTestClass {
-
-    @Mock private WebDriver mockedDriver;
+public class SeleniumRuleTest {
 
     @Test
-    public void rulesShouldBeCalledInOrder() throws Throwable {
+    public void rulesShouldBeInvokedInCorrectOrder() throws Throwable {
         TestLoggerRule testLoggerRule = spy(new TestLoggerRule(Logger.getLogger("spied logger")));
-        TakeScreenshotOnFailureRule screenshotOnFailureRule = spy(new TakeScreenshotOnFailureRule(new DummyDriver(), OutputType.BASE64));
-        WebDriverFactory driverFactory = mock(WebDriverFactory.class);
+        TakeScreenshotOnFailureRule screenshotOnFailureRule = spy(new TakeScreenshotOnFailureRule(mock(WebDriverProvider.class), OutputType.BASE64));
+        WebDriverResource driverResource = spy(new WebDriverResource(Mockito.mock(WebDriver.class)));
 
-        SeleniumRule sut = SeleniumRule.builder(driverFactory)
+        SeleniumRule sut = new SeleniumRule.Builder(driverResource)
                 .withTestLogger(testLoggerRule)
                 .takeScreenshotOnFailure(screenshotOnFailureRule)
                 .build();
 
-        final RuntimeException exception = new RuntimeException("test failing");
+        final RuntimeException exception = new ExpectedException("test failing (expected)");
         Statement failingTest = new Statement() {
             @Override
             public void evaluate() throws Throwable {
@@ -50,19 +45,17 @@ public class SeleniumRuleTest extends BaseMockitoTestClass {
         Description desc = Description.createTestDescription("test class", "test name");
         Statement s = sut.apply(failingTest, desc);
 
-        s.evaluate();
-
-        InOrder inOrder = inOrder(testLoggerRule, screenshotOnFailureRule, driverFactory);
-        inOrder.verify(testLoggerRule).starting(desc);
-        inOrder.verify(driverFactory).create();
-        inOrder.verify(screenshotOnFailureRule).failed(exception, desc);
-        inOrder.verify(testLoggerRule).failed(exception, desc);
-    }
-
-    private static class BuilderTestSubclass extends SeleniumRule.Builder {
-        protected BuilderTestSubclass(WebDriverResource driverResource) {
-            super(driverResource);
+        try {
+            s.evaluate();
+        } catch (ExpectedException e) {
+            // expected
         }
+
+        InOrder inOrder = inOrder(testLoggerRule, screenshotOnFailureRule, driverResource);
+        inOrder.verify(testLoggerRule).starting(desc); // log "test started"
+        inOrder.verify(driverResource).before(); // create driver
+        inOrder.verify(screenshotOnFailureRule).failed(exception, desc); // take screenshot on failure
+        inOrder.verify(testLoggerRule).failed(exception, desc); // log "test failed"
     }
 
     @Test
@@ -92,6 +85,12 @@ public class SeleniumRuleTest extends BaseMockitoTestClass {
         @Test
         public void secondTest() {
             assertNotNull(driver());
+        }
+    }
+
+    private static class ExpectedException extends RuntimeException {
+        public ExpectedException(String message) {
+            super(message);
         }
     }
 }

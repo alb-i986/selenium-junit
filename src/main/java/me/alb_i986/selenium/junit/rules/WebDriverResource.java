@@ -4,7 +4,6 @@ import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.ExternalResource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.internal.WrapsDriver;
 
 /**
  * A {@link org.junit.rules.TestRule} managing {@link WebDriver} instances during testruns,
@@ -23,7 +22,7 @@ import org.openqa.selenium.internal.WrapsDriver;
  * }
  * </pre>
  */
-public class WebDriverResource extends ExternalResource implements WrapsDriver {
+public class WebDriverResource extends ExternalResource implements WebDriverProvider {
 
     private final WebDriverFactory driverFactory;
     private WebDriver driver;
@@ -67,18 +66,17 @@ public class WebDriverResource extends ExternalResource implements WrapsDriver {
      * @see WebDriver#quit()
      */
     @Override
-    public void after() {
+    protected void after() {
         driver.quit();
     }
 
     /**
      * @throws IllegalStateException if the driver is currently null,
-     * which means that it has not been created with before() yet
+     * which means that it has not been created, i.e. before() hasn't been called yet.
      */
-    @Override
-    public WebDriver getWrappedDriver() {
+    public WebDriver getDriver() {
         if (driver == null) {
-            throw new IllegalStateException("The driver is null.");
+            throw new IllegalStateException("The driver has not been initialized yet.");
         }
         return driver;
     }

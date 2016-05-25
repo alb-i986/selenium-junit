@@ -1,5 +1,6 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -9,11 +10,39 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
 
-import me.alb_i986.selenium.WebDriverFactory;
-
 /**
- * A {@link RuleChain} providing access to a {@link WebDriver}. <p> Use {@link
- * #builder(WebDriverFactory)} to instantiate.
+ * A {@link TestRule} for Selenium tests.
+ * <p>
+ * Start from {@link #builder(WebDriverFactory)} to create an instance.
+ * <p>
+ * Example of usage:
+ * <pre>
+ * public class MySeleniumTest {
+ *     &#064;Rule
+ *     public SeleniumRule seleniumRule = SeleniumRule.builder(new ChromeDriverFactory())
+ *          .withTestLogger(Logger.getLogger("my.logger"))
+ *          .takeScreenshotOnFailure(OutputType.BASE64)
+ *          .build();
+ *
+ *     protected WebDriver driver() {
+ *         return seleniumRule.getDriver();
+ *     }
+ *
+ *     &#064;Test
+ *     public void myTest() {
+ *         driver().get("http://www.google.com");
+ *          driver().findElement(By.name("q")).sendKeys("selenium-junit" + Keys.ENTER);
+ *          new WebDriverWait(driver(), 5).until(ExpectedConditions.titleContains("selenium-junit"));
+ *     }
+ *
+ *     private static class ChromeDriverFactory implements WebDriverFactory {
+ *         &#064;Override
+ *         public WebDriver create() {
+ *             return new ChromeDriver();
+ *         }
+ *     }
+ * }
+ * </pre>
  */
 public abstract class SeleniumRule implements TestRule {
 
@@ -87,7 +116,7 @@ public abstract class SeleniumRule implements TestRule {
             return new SeleniumRule(ruleChain) {
                 @Override
                 public WebDriver getDriver() {
-                    return driverResource.getWrappedDriver();
+                    return driverResource.getDriver();
                 }
             };
         }
