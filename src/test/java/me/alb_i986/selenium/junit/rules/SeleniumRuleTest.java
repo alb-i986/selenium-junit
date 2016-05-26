@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -36,24 +37,26 @@ public class SeleniumRuleTest {
                 .build();
 
         final RuntimeException exception = new ExpectedException("test failing (expected)");
-        Statement failingTest = new Statement() {
+        Statement failingTest = spy(new Statement() {
             @Override
             public void evaluate() throws Throwable {
                 throw exception;
             }
-        };
+        });
         Description desc = Description.createTestDescription("test class", "test name");
         Statement s = sut.apply(failingTest, desc);
 
         try {
             s.evaluate();
+            fail("wtf the test was supposed to fail");
         } catch (ExpectedException e) {
             // expected
         }
 
-        InOrder inOrder = inOrder(testLoggerRule, screenshotOnFailureRule, driverResource);
+        InOrder inOrder = inOrder(testLoggerRule, screenshotOnFailureRule, driverResource, failingTest);
         inOrder.verify(testLoggerRule).starting(desc); // log "test started"
         inOrder.verify(driverResource).before(); // create driver
+        inOrder.verify(failingTest).evaluate(); // run failing test
         inOrder.verify(testLoggerRule).failed(exception, desc); // log "test failed"
         inOrder.verify(screenshotOnFailureRule).failed(exception, desc); // take screenshot on failure
     }
