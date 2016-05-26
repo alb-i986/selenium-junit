@@ -1,6 +1,5 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -10,16 +9,18 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
 
+import me.alb_i986.selenium.WebDriverFactory;
+
 /**
  * A {@link TestRule} for Selenium tests.
  * <p>
- * Start from {@link #builder(WebDriverFactory)} to create an instance.
+ * Start from {@link #configure(WebDriverFactory)} to build an instance.
  * <p>
  * Example of usage:
  * <pre>
  * public class MySeleniumTest {
  *     &#064;Rule
- *     public SeleniumRule seleniumRule = SeleniumRule.builder(new ChromeDriverFactory())
+ *     public SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
  *          .withTestLogger(Logger.getLogger("my.logger"))
  *          .takeScreenshotOnFailure(OutputType.BASE64)
  *          .build();
@@ -51,12 +52,12 @@ public abstract class SeleniumRule implements TestRule {
     /**
      * @param factory the factory to use to create {@link WebDriver} instances before a test starts
      */
-    public static Builder builder(WebDriverFactory factory) {
+    public static Builder configure(WebDriverFactory factory) {
         return new Builder(factory);
     }
 
     /**
-     * Please use {@link #builder(WebDriverFactory)} instead, to instantiate.
+     * Please use {@link #configure(WebDriverFactory)} instead, to instantiate.
      */
     protected SeleniumRule(RuleChain ruleChain) {
         if (ruleChain == null) {

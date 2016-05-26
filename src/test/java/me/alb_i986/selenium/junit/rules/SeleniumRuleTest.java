@@ -1,6 +1,5 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.MockedDriverFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -13,6 +12,8 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
+
+import me.alb_i986.selenium.MockedDriverFactory;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
@@ -69,7 +70,7 @@ public class SeleniumRuleTest {
 
     public static class TestClassWithMinimalSeleniumRuleChain {
         @Rule
-        public SeleniumRule seleniumRule = SeleniumRule.builder(new MockedDriverFactory())
+        public SeleniumRule seleniumRule = SeleniumRule.configure(new MockedDriverFactory())
                 .withTestLogger(Logger.getLogger("asd"))
                 .build();
 
