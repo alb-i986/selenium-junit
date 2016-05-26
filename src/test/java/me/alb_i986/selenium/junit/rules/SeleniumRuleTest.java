@@ -1,5 +1,6 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.MockedDriverFactory;
 import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,8 +13,6 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
-
-import me.alb_i986.selenium.MockedDriverFactory;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
@@ -33,7 +32,7 @@ public class SeleniumRuleTest {
 
         SeleniumRule sut = new SeleniumRule.Builder(driverResource)
                 .withTestLogger(testLoggerRule)
-                .takeScreenshotOnFailure(screenshotOnFailureRule)
+                .toTakeScreenshotOnFailure(screenshotOnFailureRule)
                 .build();
 
         final RuntimeException exception = new ExpectedException("test failing (expected)");

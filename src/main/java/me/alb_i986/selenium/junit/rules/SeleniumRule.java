@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  *     &#064;Rule
  *     public SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
  *          .withTestLogger(Logger.getLogger("my.logger"))
- *          .takeScreenshotOnFailure(OutputType.BASE64)
+ *          .toTakeScreenshotOnFailure(OutputType.BASE64)
  *          .build();
  *
  *     protected WebDriver driver() {
@@ -97,11 +97,11 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
             return this;
         }
 
-        public <X> Builder takeScreenshotOnFailure(OutputType<X> outputType) {
-            return takeScreenshotOnFailure(new TakeScreenshotOnFailureRule(driverResource, outputType));
+        public <X> Builder toTakeScreenshotOnFailure(OutputType<X> outputType) {
+            return toTakeScreenshotOnFailure(new TakeScreenshotOnFailureRule(driverResource, outputType));
         }
 
-        protected <X> Builder takeScreenshotOnFailure(TakeScreenshotOnFailureRule<X> takeScreenshotOnFailureRule) {
+        protected <X> Builder toTakeScreenshotOnFailure(TakeScreenshotOnFailureRule<X> takeScreenshotOnFailureRule) {
             this.screenshotOnFailureRule = takeScreenshotOnFailureRule;
             return this;
         }
