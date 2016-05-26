@@ -1,5 +1,6 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.OutputType;
@@ -34,6 +35,6 @@ public class TakeScreenshotOnFailureRule<X> extends TestWatcher {
             // TODO do something with the screenshot!
             System.out.println("<img src=\"data:image/png;base64," + screenshot + "\"" +
                     " alt=\"screenshot of test failure\" />");
-        } // TODO else report that the screenshot was not taken because blahblah
+        } // TODO else report that the screenshot was not taken because.. blah blah
     }
 }

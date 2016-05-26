@@ -1,6 +1,5 @@
 package me.alb_i986.selenium;
 
-import me.alb_i986.selenium.junit.rules.WebDriverProvider;
 import org.openqa.selenium.WebDriver;
 
 /**

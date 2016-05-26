@@ -1,5 +1,6 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.Description;

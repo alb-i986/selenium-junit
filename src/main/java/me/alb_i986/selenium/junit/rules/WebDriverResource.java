@@ -1,5 +1,6 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.rules.ExternalResource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -64,8 +65,8 @@ public class WebDriverResource extends ExternalResource implements WebDriverProv
     }
 
     /**
-     * @throws IllegalStateException if the driver is currently null,
-     * which means that it has not been created, i.e. before() hasn't been called yet.
+     * @throws IllegalStateException if the driver has not been initialized yet,
+     * which means that before() hasn't been called.
      */
     public WebDriver getDriver() {
         if (driver == null) {

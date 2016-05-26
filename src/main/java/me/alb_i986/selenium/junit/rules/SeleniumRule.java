@@ -1,5 +1,7 @@
 package me.alb_i986.selenium.junit.rules;
 
+import me.alb_i986.selenium.WebDriverFactory;
+import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -8,8 +10,6 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
-
-import me.alb_i986.selenium.WebDriverFactory;
 
 /**
  * A {@link TestRule} for Selenium tests.
@@ -45,7 +45,7 @@ import me.alb_i986.selenium.WebDriverFactory;
  * }
  * </pre>
  */
-public abstract class SeleniumRule implements TestRule {
+public abstract class SeleniumRule implements TestRule, WebDriverProvider {
 
     private final RuleChain ruleChain;
 
@@ -73,8 +73,6 @@ public abstract class SeleniumRule implements TestRule {
     public Statement apply(Statement base, Description description) {
         return ruleChain.apply(base, description);
     }
-
-    public abstract WebDriver getDriver();
 
     public static class Builder {
 
@@ -109,20 +107,33 @@ public abstract class SeleniumRule implements TestRule {
         }
 
         public SeleniumRule build() {
-            RuleChain ruleChain = RuleChain.emptyRuleChain();
+            RuleChainBuilder chainBuilder = new RuleChainBuilder();
             if (testLogger != null) {
-                ruleChain = ruleChain.around(testLogger);
+                chainBuilder.append(testLogger);
             }
-            ruleChain = ruleChain.around(driverResource);
+            chainBuilder.append(driverResource);
             if (screenshotOnFailureRule != null) {
-                ruleChain = ruleChain.around(screenshotOnFailureRule);
+                chainBuilder.append(screenshotOnFailureRule);
             }
-            return new SeleniumRule(ruleChain) {
+            return new SeleniumRule(chainBuilder.build()) {
                 @Override
                 public WebDriver getDriver() {
                     return driverResource.getDriver();
                 }
             };
+        }
+    }
+
+    private static class RuleChainBuilder {
+        private RuleChain ruleChain = RuleChain.emptyRuleChain();
+
+        public RuleChainBuilder append(TestRule enclosedRule) {
+            ruleChain = ruleChain.around(enclosedRule);
+            return this;
+        }
+
+        public RuleChain build() {
+            return ruleChain;
         }
     }
 }
