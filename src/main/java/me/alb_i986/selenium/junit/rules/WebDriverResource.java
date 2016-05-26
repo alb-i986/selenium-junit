@@ -68,6 +68,7 @@ public class WebDriverResource extends ExternalResource implements WebDriverProv
      * @throws IllegalStateException if the driver has not been initialized yet,
      * which means that before() hasn't been called.
      */
+    @Override
     public WebDriver getDriver() {
         if (driver == null) {
             throw new IllegalStateException("The driver has not been initialized yet.");
@@ -76,7 +77,7 @@ public class WebDriverResource extends ExternalResource implements WebDriverProv
     }
 
     /**
-     * To be used by unit tests only!
+     * <b>Warning</b>: to be used by unit tests only!
      */
     void setDriver(WebDriver driver) {
         this.driver = driver;
