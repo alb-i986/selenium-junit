@@ -1,11 +1,13 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+
+import me.alb_i986.selenium.WebDriverProvider;
 
 /**
  * A {@link org.junit.rules.TestRule} taking a screenshot in case of test failure.
@@ -24,17 +26,22 @@ public class TakeScreenshotOnFailureRule<X> extends TestWatcher {
         this.outputType = outputType;
     }
 
-    /**
-     * @throws org.openqa.selenium.WebDriverException if taking the screenshot fails
-     */
     @Override
-    protected void failed(Throwable e, Description description) {
+    protected void failed(Throwable failure, Description description) {
         WebDriver driver = driverProvider.getDriver();
-        if (driver instanceof TakesScreenshot) {
+        if (!(driver instanceof TakesScreenshot)) {
+            // TODO log
+            return;
+        }
+
+        try {
             X screenshot = ((TakesScreenshot) driver).getScreenshotAs(outputType);
             // TODO do something with the screenshot!
             System.out.println("<img src=\"data:image/png;base64," + screenshot + "\"" +
-                    " alt=\"screenshot of test failure\" />");
-        } // TODO else report that the screenshot was not taken because.. blah blah
+                    " alt=\"screenshot on failure for test '" +
+                    description.getDisplayName() + "'\" />");
+        } catch (WebDriverException e) {
+            // TODO report that taking screenshot failed
+        }
     }
 }

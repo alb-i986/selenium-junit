@@ -1,9 +1,5 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.BaseMockitoTestClass;
-import me.alb_i986.selenium.DriverProviderReturning;
-import me.alb_i986.selenium.DummyDriverProvider;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.mockito.Mock;
@@ -12,16 +8,22 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
+import me.alb_i986.BaseMockitoTestClass;
+import me.alb_i986.selenium.DriverProviderReturning;
+import me.alb_i986.selenium.DummyDriverProvider;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class TakeScreenshotOnFailureRuleTest extends BaseMockitoTestClass {
 
-    @Mock private WebDriverTakingScreenshot mockedDriver;
+    @Mock private WebDriverTakingScreenshot mockedDriverTakingScreenshots;
+    @Mock private WebDriver mockedDriverNotTakingScreenshots;
 
     @Test
     public void instantiationShouldFailGivenNullDriverProvider() {
@@ -46,29 +48,37 @@ public class TakeScreenshotOnFailureRuleTest extends BaseMockitoTestClass {
     }
 
     @Test
-    public void failedShouldTakeScreenshotSuccessfully() {
-        OutputType<String> outputType = OutputType.BASE64;
-        given(mockedDriver.getScreenshotAs(outputType)).willReturn("SCREENSHOT STUB");
-        TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(new DriverProviderReturning(mockedDriver), outputType);
+    public void failedShouldDoNothingWhenDriverCantTakeScreenshots() {
+        TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(
+                new DriverProviderReturning(mockedDriverNotTakingScreenshots), OutputType.BASE64);
 
         sut.failed(new RuntimeException("failure"), Description.createTestDescription("class", "name"));
 
-        verify(mockedDriver).getScreenshotAs(outputType);
+        verifyZeroInteractions(mockedDriverTakingScreenshots);
+    }
+
+    @Test
+    public void failedShouldTakeScreenshotSuccessfully() {
+        OutputType<String> outputType = OutputType.BASE64;
+        given(mockedDriverTakingScreenshots.getScreenshotAs(outputType)).willReturn("SCREENSHOT STUB");
+        TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(
+                new DriverProviderReturning(mockedDriverTakingScreenshots), outputType);
+
+        sut.failed(new RuntimeException("failure"), Description.createTestDescription("class", "name"));
+
+        verify(mockedDriverTakingScreenshots).getScreenshotAs(outputType);
         // TODO verify some more when we'll have implemented some more logic in the SUT
     }
 
     @Test
-    public void failedShouldThrowWhenGetScreenshotAsFails() {
-        given(mockedDriver.getScreenshotAs(any(OutputType.class))).willThrow(WebDriverException.class);
-        TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(new DriverProviderReturning(mockedDriver), OutputType.BASE64);
+    public void failedShouldNotThrowWhenGetScreenshotAsFails() {
+        given(mockedDriverTakingScreenshots.getScreenshotAs(any(OutputType.class))).willThrow(WebDriverException.class);
+        TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(
+                new DriverProviderReturning(mockedDriverTakingScreenshots), OutputType.BASE64);
 
-        try {
-            sut.failed(new Throwable("failure"), Description.createTestDescription("class", "name"));
+        sut.failed(new Throwable("failure"), Description.createTestDescription("class", "name"));
 
-            Assert.fail("failed() should throw when getScreenshotAs() fails");
-        } catch (WebDriverException e) {
-            // expected
-        }
+        // failed() should not throw
     }
 
     private interface WebDriverTakingScreenshot extends WebDriver, TakesScreenshot {}

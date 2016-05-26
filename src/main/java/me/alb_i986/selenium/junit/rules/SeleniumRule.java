@@ -1,7 +1,5 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverFactory;
-import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -10,6 +8,9 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
+
+import me.alb_i986.selenium.WebDriverFactory;
+import me.alb_i986.selenium.WebDriverProvider;
 
 /**
  * A {@link TestRule} for Selenium tests.
@@ -50,7 +51,7 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
     private final RuleChain ruleChain;
 
     /**
-     * Gives access to a configuration API (a Builder), which allows to
+     * Gives access to a fluent configuration API (a Builder), which allows to
      * build a {@link SeleniumRule} as per your configuration needs.
      *
      * @param factory the factory to use to create {@link WebDriver} instances before a test starts
