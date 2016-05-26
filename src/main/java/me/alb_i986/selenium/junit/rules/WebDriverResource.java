@@ -1,15 +1,17 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.ExternalResource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+
+import me.alb_i986.selenium.WebDriverFactory;
 
 /**
  * A {@link org.junit.rules.TestRule} managing {@link WebDriver} instances during testruns,
  * i.e. opening and closing real browsers.
  * <p>
- * Before a test starts, a new {@link WebDriver} is created. The actual creation of the driver is delegated to a {@link WebDriverFactory}.
+ * Before a test starts, a new driver is created.
+ * The actual creation of the driver is delegated to a {@link WebDriverFactory}.
  * After a test terminates, the driver is quit.
  * <p>
  * Not thread safe. This shouldn't be an issue, as long as every test gets a new instance of the rule.
@@ -26,15 +28,6 @@ public class WebDriverResource extends ExternalResource implements WebDriverProv
 
     private final WebDriverFactory driverFactory;
     private WebDriver driver;
-
-    public WebDriverResource(final WebDriver driver) {
-        this(new WebDriverFactory() {
-            @Override
-            public WebDriver create() {
-                return driver;
-            }
-        });
-    }
 
     public WebDriverResource(WebDriverFactory driverFactory) {
         if (driverFactory == null) {

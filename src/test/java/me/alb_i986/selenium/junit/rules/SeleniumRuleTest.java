@@ -7,7 +7,6 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runners.model.Statement;
 import org.mockito.InOrder;
-import org.mockito.Mockito;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 
@@ -29,7 +28,7 @@ public class SeleniumRuleTest {
     public void rulesShouldBeInvokedInCorrectOrder() throws Throwable {
         TestLoggerRule testLoggerRule = spy(new TestLoggerRule(Logger.getLogger("spied logger")));
         TakeScreenshotOnFailureRule screenshotOnFailureRule = spy(new TakeScreenshotOnFailureRule(mock(WebDriverProvider.class), OutputType.BASE64));
-        WebDriverResource driverResource = spy(new WebDriverResource(Mockito.mock(WebDriver.class)));
+        WebDriverResource driverResource = spy(new WebDriverResource(new MockedDriverFactory()));
 
         SeleniumRule sut = new SeleniumRule.Builder(driverResource)
                 .withTestLogger(testLoggerRule)
@@ -55,8 +54,8 @@ public class SeleniumRuleTest {
         InOrder inOrder = inOrder(testLoggerRule, screenshotOnFailureRule, driverResource);
         inOrder.verify(testLoggerRule).starting(desc); // log "test started"
         inOrder.verify(driverResource).before(); // create driver
-        inOrder.verify(screenshotOnFailureRule).failed(exception, desc); // take screenshot on failure
         inOrder.verify(testLoggerRule).failed(exception, desc); // log "test failed"
+        inOrder.verify(screenshotOnFailureRule).failed(exception, desc); // take screenshot on failure
     }
 
     @Test

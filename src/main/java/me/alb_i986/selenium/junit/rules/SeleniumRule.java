@@ -50,6 +50,9 @@ public abstract class SeleniumRule implements TestRule {
     private final RuleChain ruleChain;
 
     /**
+     * Gives access to a configuration API (a Builder), which allows to
+     * build a {@link SeleniumRule} as per your configuration needs.
+     *
      * @param factory the factory to use to create {@link WebDriver} instances before a test starts
      */
     public static Builder configure(WebDriverFactory factory) {
@@ -79,7 +82,7 @@ public abstract class SeleniumRule implements TestRule {
         private TakeScreenshotOnFailureRule screenshotOnFailureRule;
         private TestLoggerRule testLogger;
 
-        private Builder(WebDriverFactory factory) {
+        protected Builder(WebDriverFactory factory) {
             this(new WebDriverResource(factory));
         }
 
