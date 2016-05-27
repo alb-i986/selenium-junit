@@ -12,18 +12,17 @@ import me.alb_i986.BaseMockitoTestClass;
 import me.alb_i986.selenium.DriverProviderReturning;
 import me.alb_i986.selenium.DummyDriverProvider;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class TakeScreenshotOnFailureRuleTest extends BaseMockitoTestClass {
 
     @Mock private WebDriverTakingScreenshot mockedDriverTakingScreenshots;
-    @Mock private WebDriver mockedDriverNotTakingScreenshots;
 
     @Test
     public void instantiationShouldFailGivenNullDriverProvider() {
@@ -49,22 +48,23 @@ public class TakeScreenshotOnFailureRuleTest extends BaseMockitoTestClass {
 
     @Test
     public void failedShouldDoNothingWhenDriverCantTakeScreenshots() {
+        WebDriver mockedDriverNotTakingScreenshots = mock(WebDriver.class);
         TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(
                 new DriverProviderReturning(mockedDriverNotTakingScreenshots), OutputType.BASE64);
 
-        sut.failed(new RuntimeException("failure"), Description.createTestDescription("class", "name"));
+        sut.failed(new RuntimeException("failure (expected)"), Description.createTestDescription("class", "name"));
 
-        verifyZeroInteractions(mockedDriverTakingScreenshots);
+        verifyZeroInteractions(mockedDriverNotTakingScreenshots);
     }
 
     @Test
-    public void failedShouldTakeScreenshotSuccessfully() {
+    public void failedShouldTakeScreenshotSuccessfullyWhenDriverCanTakeScreenshots() {
         OutputType<String> outputType = OutputType.BASE64;
         given(mockedDriverTakingScreenshots.getScreenshotAs(outputType)).willReturn("SCREENSHOT STUB");
         TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(
                 new DriverProviderReturning(mockedDriverTakingScreenshots), outputType);
 
-        sut.failed(new RuntimeException("failure"), Description.createTestDescription("class", "name"));
+        sut.failed(new RuntimeException("failure (expected)"), Description.createTestDescription("class", "name"));
 
         verify(mockedDriverTakingScreenshots).getScreenshotAs(outputType);
         // TODO verify some more when we'll have implemented some more logic in the SUT
@@ -76,9 +76,9 @@ public class TakeScreenshotOnFailureRuleTest extends BaseMockitoTestClass {
         TakeScreenshotOnFailureRule<String> sut = new TakeScreenshotOnFailureRule<>(
                 new DriverProviderReturning(mockedDriverTakingScreenshots), OutputType.BASE64);
 
-        sut.failed(new Throwable("failure"), Description.createTestDescription("class", "name"));
+        sut.failed(new RuntimeException("failure (expected)"), Description.createTestDescription("class", "name"));
 
-        // failed() should not throw
+        // then failed() should not throw
     }
 
     private interface WebDriverTakingScreenshot extends WebDriver, TakesScreenshot {}

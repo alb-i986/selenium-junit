@@ -1,6 +1,5 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.BaseMockitoTestClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -10,20 +9,19 @@ import org.openqa.selenium.remote.service.DriverService;
 
 import java.io.IOException;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import me.alb_i986.BaseMockitoTestClass;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.mock;
 import static org.mockito.BDDMockito.verify;
-import static org.mockito.Mockito.mock;
 
 public class DriverServiceResourceTest extends BaseMockitoTestClass {
 
     @Mock private DriverService mockedService;
 
     @Test
-    public void nullDriverServiceShouldNotBeAllowed() {
+    public void instantiationShouldFailWhenDriverIsNull() {
         try {
             new DriverServiceResource(null);
             fail("null DriverService should not be allowed");

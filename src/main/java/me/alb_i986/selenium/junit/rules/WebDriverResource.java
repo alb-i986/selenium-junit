@@ -1,11 +1,11 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.rules.ExternalResource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import me.alb_i986.selenium.WebDriverFactory;
+import me.alb_i986.selenium.WebDriverProvider;
 
 /**
  * A {@link org.junit.rules.TestRule} managing {@link WebDriver} instances during testruns,
@@ -71,7 +71,7 @@ public class WebDriverResource extends ExternalResource implements WebDriverProv
     @Override
     public WebDriver getDriver() {
         if (driver == null) {
-            throw new IllegalStateException("The driver has not been initialized yet.");
+            throw new IllegalStateException("Looks like the driver has not been initialized yet.");
         }
         return driver;
     }

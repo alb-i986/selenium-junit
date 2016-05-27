@@ -1,7 +1,5 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.MockedDriverFactory;
-import me.alb_i986.selenium.WebDriverProvider;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -14,11 +12,11 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import me.alb_i986.selenium.MockedDriverFactory;
+import me.alb_i986.selenium.WebDriverProvider;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;

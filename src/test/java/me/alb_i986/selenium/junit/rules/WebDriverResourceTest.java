@@ -1,19 +1,17 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.BaseMockitoTestClass;
-import me.alb_i986.selenium.DummyDriver;
-import me.alb_i986.selenium.DummyDriverFactory;
-import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import me.alb_i986.BaseMockitoTestClass;
+import me.alb_i986.selenium.DummyDriver;
+import me.alb_i986.selenium.DummyDriverFactory;
+import me.alb_i986.selenium.WebDriverFactory;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 
@@ -23,10 +21,9 @@ public class WebDriverResourceTest extends BaseMockitoTestClass {
     @Mock private WebDriver mockedDriver;
 
     @Test
-    public void nullDriverFactoryInConstructorShouldNotBeAllowed() {
-        WebDriverFactory nullFactory = null;
+    public void instantiationShouldFailWhenDriverFactoryIsNull() {
         try {
-            new WebDriverResource(nullFactory);
+            new WebDriverResource(null);
             fail("null WebDriverFactory in constructor should not be allowed");
         } catch (IllegalArgumentException e) {
             // expected
