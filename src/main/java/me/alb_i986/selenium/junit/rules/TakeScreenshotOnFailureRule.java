@@ -37,11 +37,15 @@ public class TakeScreenshotOnFailureRule<X> extends TestWatcher {
         try {
             X screenshot = ((TakesScreenshot) driver).getScreenshotAs(outputType);
             // TODO do something with the screenshot!
-            System.out.println("<img src=\"data:image/png;base64," + screenshot + "\"" +
-                    " alt=\"screenshot on failure for test '" +
-                    description.getDisplayName() + "'\" />");
+            System.out.println(getImageHtml(screenshot.toString(), description));
         } catch (WebDriverException e) {
             // TODO report that taking screenshot failed
         }
+    }
+
+    private static String getImageHtml(String screenshotAsBase64, Description description) {
+        return "<img src=\"data:image/png;base64," + screenshotAsBase64 + "\"" +
+                " alt=\"screenshot on failure for test '" +
+                description.getDisplayName() + "'\" />";
     }
 }
