@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 /**
  * @author ascotto
  */
-public class TestLoggerRule extends TestWatcher {
+public abstract class TestLoggerRule extends TestWatcher {
 
     protected final Logger logger;
 
@@ -20,23 +20,38 @@ public class TestLoggerRule extends TestWatcher {
         this.logger = logger;
     }
 
-    @Override
-    protected void starting(Description description) {
-        logger.info("STARTING " + description.getDisplayName());
+    public static TestLoggerRule onStart(Logger logger) {
+        return new LogOnStart(logger);
     }
 
-    @Override
-    protected void skipped(AssumptionViolatedException e, Description description) {
-        logger.info("SKIPPED " + description.getDisplayName());
+    public static TestLoggerRule onFinish(Logger logger) {
+        return new LogOnStart(logger);
     }
 
-    @Override
-    protected void failed(Throwable e, Description description) {
-        logger.warning("FAILED " + description.getDisplayName());
-    }
+    private static class LogOnStart extends TestLoggerRule {
 
-    @Override
-    protected void succeeded(Description description) {
-        logger.info("PASSED " + description.getDisplayName());
+        private LogOnStart(Logger logger) {
+            super(logger);
+        }
+
+        @Override
+        protected void starting(Description description) {
+            logger.info("STARTING " + description.getDisplayName());
+        }
+
+        @Override
+        protected void skipped(AssumptionViolatedException e, Description description) {
+            logger.info("SKIPPED " + description.getDisplayName());
+        }
+
+        @Override
+        protected void failed(Throwable e, Description description) {
+            logger.warning("FAILED " + description.getDisplayName());
+        }
+
+        @Override
+        protected void succeeded(Description description) {
+            logger.info("PASSED " + description.getDisplayName());
+        }
     }
 }

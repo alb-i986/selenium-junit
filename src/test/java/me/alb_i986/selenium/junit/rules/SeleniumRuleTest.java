@@ -17,6 +17,7 @@ import me.alb_i986.selenium.WebDriverProvider;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -25,38 +26,38 @@ public class SeleniumRuleTest {
 
     @Test
     public void rulesShouldBeInvokedInCorrectOrder() throws Throwable {
-        TestLoggerRule testLoggerRule = spy(new TestLoggerRule(Logger.getLogger("spied logger")));
-        TakeScreenshotOnFailureRule screenshotOnFailureRule = spy(new TakeScreenshotOnFailureRule(mock(WebDriverProvider.class), OutputType.BASE64));
+        TestLoggerOnStartRule testLoggerOnStart = spy(new TestLoggerOnStartRule(Logger.getLogger("spied logger")));
+        TestLoggerOnFinishRule testLoggerOnFinish = spy(new TestLoggerOnFinishRule(Logger.getLogger("spied logger")));
+        TakeScreenshotOnFailureRule screenshotOnFailure = spy(new TakeScreenshotOnFailureRule(mock(WebDriverProvider.class), OutputType.BASE64));
         WebDriverResource driverResource = spy(new WebDriverResource(new MockedDriverFactory()));
 
         SeleniumRule sut = new SeleniumRule.Builder(driverResource)
-                .withTestLogger(testLoggerRule)
-                .toTakeScreenshotOnFailure(screenshotOnFailureRule)
+                .withTestLoggerOnStart(testLoggerOnStart)
+                .withTestLoggerOnFinish(testLoggerOnFinish)
+                .toTakeScreenshotOnFailure(screenshotOnFailure)
                 .build();
 
-        final RuntimeException exception = new ExpectedException("test failing (expected)");
-        Statement failingTest = spy(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                throw exception;
-            }
-        });
+        // given a failing test
+        final RuntimeException exception = new ExpectedException("simulated test failure (expected)");
+        Statement failingTest = mock(Statement.class);
+        willThrow(exception).given(failingTest).evaluate();
         Description desc = Description.createTestDescription("test class", "test name");
-        Statement s = sut.apply(failingTest, desc);
 
+        // run the compound statement made up of the test and the rules
         try {
-            s.evaluate();
-            fail("wtf the test was supposed to fail");
+            sut.apply(failingTest, desc).evaluate();
+            fail("WTF, the simulated test was supposed to fail");
         } catch (ExpectedException e) {
             // expected
         }
 
-        InOrder inOrder = inOrder(testLoggerRule, screenshotOnFailureRule, driverResource, failingTest);
-        inOrder.verify(testLoggerRule).starting(desc); // log "test started"
+        InOrder inOrder = inOrder(testLoggerOnStart, testLoggerOnFinish, screenshotOnFailure, driverResource, failingTest);
+        inOrder.verify(testLoggerOnStart).starting(desc); // log "test started"
         inOrder.verify(driverResource).before(); // create driver
-        inOrder.verify(failingTest).evaluate(); // run failing test
-        inOrder.verify(testLoggerRule).failed(exception, desc); // log "test failed"
-        inOrder.verify(screenshotOnFailureRule).failed(exception, desc); // take screenshot on failure
+        inOrder.verify(failingTest).evaluate(); // run test
+        inOrder.verify(testLoggerOnFinish).failed(exception, desc); // log "test failed"
+        inOrder.verify(screenshotOnFailure).failed(exception, desc); // take screenshot on failure
+        inOrder.verify(driverResource).after(); // close driver
     }
 
     @Test

@@ -78,8 +78,9 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
     public static class Builder {
 
         private final WebDriverResource driverResource;
-        private TakeScreenshotOnFailureRule screenshotOnFailureRule;
-        private TestLoggerRule testLogger;
+        private TakeScreenshotOnFailureRule screenshotOnFailure;
+        private TestLoggerOnStartRule testLoggerOnStart;
+        private TestLoggerOnFinishRule testLoggerOnFinish;
 
         protected Builder(WebDriverFactory factory) {
             this(new WebDriverResource(factory));
@@ -90,11 +91,18 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
         }
 
         public Builder withTestLogger(Logger logger) {
-            return withTestLogger(new TestLoggerRule(logger));
+            withTestLoggerOnStart(new TestLoggerOnStartRule(logger));
+            withTestLoggerOnFinish(new TestLoggerOnFinishRule(logger));
+            return this;
         }
 
-        protected Builder withTestLogger(TestLoggerRule loggerRule) {
-            this.testLogger = loggerRule;
+        protected Builder withTestLoggerOnStart(TestLoggerOnStartRule testLoggerOnStart) {
+            this.testLoggerOnStart = testLoggerOnStart;
+            return this;
+        }
+
+        protected Builder withTestLoggerOnFinish(TestLoggerOnFinishRule testLoggerOnFinish) {
+            this.testLoggerOnFinish = testLoggerOnFinish;
             return this;
         }
 
@@ -103,18 +111,21 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
         }
 
         protected <X> Builder toTakeScreenshotOnFailure(TakeScreenshotOnFailureRule<X> takeScreenshotOnFailureRule) {
-            this.screenshotOnFailureRule = takeScreenshotOnFailureRule;
+            this.screenshotOnFailure = takeScreenshotOnFailureRule;
             return this;
         }
 
         public SeleniumRule build() {
             RuleChainBuilder chainBuilder = new RuleChainBuilder();
-            if (testLogger != null) {
-                chainBuilder.append(testLogger);
+            if (testLoggerOnStart != null) {
+                chainBuilder.append(testLoggerOnStart);
             }
             chainBuilder.append(driverResource);
-            if (screenshotOnFailureRule != null) {
-                chainBuilder.append(screenshotOnFailureRule);
+            if (screenshotOnFailure != null) {
+                chainBuilder.append(screenshotOnFailure);
+            }
+            if (testLoggerOnFinish != null) {
+                chainBuilder.append(testLoggerOnFinish);
             }
             return new SeleniumRule(chainBuilder.build()) {
                 @Override
