@@ -14,4 +14,6 @@ public class TestLoggerOnStartRule extends TestLoggerRule {
     protected void starting(Description description) {
         logger.info("STARTING " + description.getDisplayName());
     }
+
+    // TODO put them in TestLoggerRule?
 }
