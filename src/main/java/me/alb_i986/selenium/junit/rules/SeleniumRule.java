@@ -51,8 +51,8 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
     private final RuleChain ruleChain;
 
     /**
-     * Gives access to a fluent configuration API (a Builder), which allows to
-     * build a {@link SeleniumRule} as per your configuration needs.
+     * Gives access to a fluent configuration API (a Builder),
+     * which allows to build a {@link SeleniumRule} as per your needs.
      *
      * @param factory the factory to use to create {@link WebDriver} instances before a test starts
      */
