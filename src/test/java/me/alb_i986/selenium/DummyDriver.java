@@ -75,9 +75,4 @@ public class DummyDriver implements WebDriver {
     public Options manage() {
         throw new UnsupportedOperationException("I'm dummy");
     }
-
-//    @Override
-    public WebDriver getWrappedDriver() {
-        throw new UnsupportedOperationException("I'm dummy");
-    }
 }
