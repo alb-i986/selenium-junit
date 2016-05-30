@@ -38,7 +38,7 @@ public class SeleniumRuleTest {
                 .build();
 
         // given a failing test
-        final RuntimeException exception = new ExpectedException("simulated test failure (expected)");
+        RuntimeException exception = new ExpectedException("simulated test failure (expected)");
         Statement failingTest = mock(Statement.class);
         willThrow(exception).given(failingTest).evaluate();
         Description desc = Description.createTestDescription("test class", "test name");
