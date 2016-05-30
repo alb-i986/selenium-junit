@@ -8,6 +8,6 @@ import org.openqa.selenium.WebDriver;
 public class DummyDriverProvider implements WebDriverProvider {
     @Override
     public WebDriver getDriver() {
-        throw new UnsupportedOperationException("I'm dummy");
+        throw new UnsupportedOperationException("I'm a Dummy");
     }
 }

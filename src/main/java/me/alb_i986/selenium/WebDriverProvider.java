@@ -2,6 +2,9 @@ package me.alb_i986.selenium;
 
 import org.openqa.selenium.WebDriver;
 
+/**
+ * Provides initialized {@link WebDriver} instances.
+ */
 public interface WebDriverProvider {
 
     /**
