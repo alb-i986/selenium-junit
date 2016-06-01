@@ -20,7 +20,7 @@ import me.alb_i986.selenium.WebDriverProvider;
  * public class MySeleniumTest {
  *     &#064;Rule
  *     public final SeleniumRule seleniumRule = new SeleniumRule(new ChromeDriverFactory())
- *          .withTestLogger(Logger.getLogger("my.logger"))
+ *          .withTestLogger(Logger.getLogger("my.logger")) // TODO change this when reporter implementation will be finished
  *          .toTakeScreenshotOnFailure(OutputType.BASE64)
  *          .toRetryOnFailure(2); // retry each test max 2 times (max 3 executions in total)
  *

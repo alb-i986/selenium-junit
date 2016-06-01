@@ -13,16 +13,16 @@ public class TestLoggerOnFinishRule extends TestLoggerRule {
 
     @Override
     protected void skipped(AssumptionViolatedException e, Description description) {
-        logger.warning("SKIPPED " + description.getDisplayName());
+        reporter.warning("SKIPPED " + description.getDisplayName());
     }
 
     @Override
     protected void failed(Throwable e, Description description) {
-        logger.warning("FAILED " + description.getDisplayName());
+        reporter.warning("FAILED " + description.getDisplayName());
     }
 
     @Override
     protected void succeeded(Description description) {
-        logger.info("PASSED " + description.getDisplayName());
+        reporter.info("PASSED " + description.getDisplayName());
     }
 }

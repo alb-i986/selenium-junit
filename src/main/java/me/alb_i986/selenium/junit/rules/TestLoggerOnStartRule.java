@@ -12,7 +12,7 @@ public class TestLoggerOnStartRule extends TestLoggerRule {
 
     @Override
     protected void starting(Description description) {
-        logger.info("STARTING " + description.getDisplayName());
+        reporter.info("STARTING " + description.getDisplayName());
     }
 
     // TODO put them in TestLoggerRule?
