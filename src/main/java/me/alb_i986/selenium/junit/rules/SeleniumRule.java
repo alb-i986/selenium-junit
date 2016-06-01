@@ -21,12 +21,12 @@ import me.alb_i986.selenium.WebDriverProvider;
  * <pre>
  * public class MySeleniumTest {
  *     &#064;Rule
- *     public SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
+ *     public final SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
  *          .withTestLogger(Logger.getLogger("my.logger"))
  *          .toTakeScreenshotOnFailure(OutputType.BASE64)
  *          .build();
  *
- *     protected WebDriver driver() {
+ *     protected final WebDriver driver() {
  *         return seleniumRule.getDriver();
  *     }
  *

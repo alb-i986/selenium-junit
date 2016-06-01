@@ -14,15 +14,14 @@ The aim of this project is to make it easy by providing a set of easy-to-setup a
 
 ## Example of usage
 
-
     public class MySeleniumTest {
        @Rule
-       public SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
+       public final SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
             .withTestLogger(Logger.getLogger("my.logger"))
             .toTakeScreenshotOnFailure(OutputType.BASE64)
             .build();
 
-       protected WebDriver driver() {
+       protected final WebDriver driver() {
            return seleniumRule.getDriver();
        }
 
@@ -39,6 +38,6 @@ The aim of this project is to make it easy by providing a set of easy-to-setup a
                return new ChromeDriver();
            }
        }
-   }
+    }
 
 Please see the javadoc of `SeleniumRule` for an up-to-date example.
