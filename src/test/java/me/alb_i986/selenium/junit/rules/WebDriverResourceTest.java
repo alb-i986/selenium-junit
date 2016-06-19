@@ -41,7 +41,7 @@ public class WebDriverResourceTest extends BaseMockitoTestClass {
         sut.before();
 
         verify(mockedDriverFactory).create();
-        assertThat(sut.getDriver(), sameInstance(dummyDriver));
+        assertThat(sut.getDriver(), is(sameInstance(dummyDriver)));
     }
 
     @Test

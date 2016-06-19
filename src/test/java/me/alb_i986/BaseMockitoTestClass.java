@@ -5,7 +5,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 /**
- * Base class for unit tests which use {@link org.mockito.Mockito}.
+ * Base class for unit tests using {@link org.mockito.Mockito}.
  * <p>
  * It provides a {@link MockitoRule}.
  */

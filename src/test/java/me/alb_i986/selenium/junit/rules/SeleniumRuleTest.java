@@ -64,7 +64,7 @@ public class SeleniumRuleTest {
     public void integrationTest() {
         Result result = JUnitCore.runClasses(TestClassWithMinimalSeleniumRuleChain.class);
 
-        assertTrue(result.wasSuccessful());
+        assertThat(result.getFailures(), empty());
         assertThat(result.getRunCount(), equalTo(2));
         // TODO assert that each test got a different driver
     }

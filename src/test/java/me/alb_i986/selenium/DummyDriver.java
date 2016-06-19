@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * {@link WebDriver} whose methods all throw {@link UnsupportedOperationException}.
+ * Dummy {@link WebDriver}, whose methods all throw {@link UnsupportedOperationException}.
  */
 public class DummyDriver implements WebDriver {
     @Override
