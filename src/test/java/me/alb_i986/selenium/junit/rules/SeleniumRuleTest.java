@@ -117,6 +117,7 @@ public class SeleniumRuleTest {
         public final SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
                 .withTestLogger(Logger.getLogger("my.logger"))
                 .toTakeScreenshotOnFailure(OutputType.BASE64)
+                .toRetryOnFailure(1)
                 .build();
 
         protected final WebDriver driver() {
@@ -130,6 +131,7 @@ public class SeleniumRuleTest {
             new WebDriverWait(driver(), 5).until(ExpectedConditions.titleContains("selenium-junit"));
         }
 
+        @Flaky
         @Test
         public void failingTest() {
             throw new WebDriverException("simulates a failing test");
