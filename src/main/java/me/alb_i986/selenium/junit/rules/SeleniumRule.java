@@ -24,6 +24,7 @@ import me.alb_i986.selenium.WebDriverProvider;
  *     public final SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
  *          .withTestLogger(Logger.getLogger("my.logger"))
  *          .toTakeScreenshotOnFailure(OutputType.BASE64)
+ *          .toRetryOnFailure(2) // retry each test max 2 times (max 3 executions in total)
  *          .build();
  *
  *     protected final WebDriver driver() {
@@ -81,6 +82,7 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
         private TakeScreenshotOnFailureRule screenshotOnFailure;
         private TestLoggerOnStartRule testLoggerOnStart;
         private TestLoggerOnFinishRule testLoggerOnFinish;
+        private RetryRule retryRule;
 
         protected Builder(WebDriverFactory factory) {
             this(new WebDriverResource(factory));
@@ -115,8 +117,20 @@ public abstract class SeleniumRule implements TestRule, WebDriverProvider {
             return this;
         }
 
+        public Builder toRetryOnFailure(int retryTimes) {
+            return toRetryOnFailure(new RetryRule(retryTimes));
+        }
+
+        protected Builder toRetryOnFailure(RetryRule retryRule) {
+            this.retryRule = retryRule;
+            return this;
+        }
+
         public SeleniumRule build() {
             RuleChainBuilder chainBuilder = new RuleChainBuilder();
+            if (retryRule != null) {
+                chainBuilder.append(retryRule);
+            }
             if (testLoggerOnStart != null) {
                 chainBuilder.append(testLoggerOnStart);
             }
