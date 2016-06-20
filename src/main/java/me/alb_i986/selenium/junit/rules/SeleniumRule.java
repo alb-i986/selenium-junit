@@ -33,8 +33,8 @@ import me.alb_i986.selenium.WebDriverProvider;
  *     &#064;Test
  *     public void myTest() {
  *         driver().get("http://www.google.com");
- *          driver().findElement(By.name("q")).sendKeys("selenium-junit" + Keys.ENTER);
- *          new WebDriverWait(driver(), 5).until(ExpectedConditions.titleContains("selenium-junit"));
+ *         driver().findElement(By.name("q")).sendKeys("selenium-junit" + Keys.ENTER);
+ *         new WebDriverWait(driver(), 5).until(ExpectedConditions.titleContains("selenium-junit"));
  *     }
  *
  *     private static class ChromeDriverFactory implements WebDriverFactory {
