@@ -13,7 +13,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
 
-import me.alb_i986.junit.ExpectedException;
+import me.alb_i986.junit.SimulatedTestFailure;
 import me.alb_i986.selenium.MockedDriverFactory;
 import me.alb_i986.selenium.WebDriverProvider;
 
@@ -43,16 +43,17 @@ public class SeleniumRuleTest {
                 .build();
 
         // given a failing test
-        ExpectedException exception = new ExpectedException("simulated test failure (expected)");
+        SimulatedTestFailure exception = new SimulatedTestFailure("simulated test failure (expected)");
         Statement failingTest = mock(Statement.class);
         willThrow(exception).given(failingTest).evaluate();
-        Description desc = Description.createTestDescription("test class", "test name");
+
+        Description desc = descriptionForFlakyTest();
 
         // run the compound statement made up of the test and the rules
         try {
-            sut.apply(failingTest, descriptionForFlakyTest())
+            sut.apply(failingTest, desc)
                     .evaluate();
-            fail("WTF, the simulated test was supposed to fail");
+            fail("WTF?! the simulated test was supposed to fail");
         } catch (Throwable e) {
             // expected
             assertThat(e.getMessage(), containsString("simulated test failure (expected)"));
@@ -67,7 +68,7 @@ public class SeleniumRuleTest {
         inOrder.verify(screenshotOnFailure).failed(exception, desc); // take screenshot on failure
         inOrder.verify(driverResource).after(); // close driver
 
-        // the test is retried: verify all the mocks are called once again
+        // the test is retried: verify all the mocks are called once again, in the correct order
         inOrder.verify(testLoggerOnStart).starting(desc); // log "test started"
         inOrder.verify(driverResource).before(); // create driver
         inOrder.verify(failingTest).evaluate(); // run test

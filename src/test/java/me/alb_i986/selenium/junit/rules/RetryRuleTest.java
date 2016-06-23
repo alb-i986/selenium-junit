@@ -9,7 +9,7 @@ import org.junit.runners.model.Statement;
 import org.mockito.Mock;
 
 import me.alb_i986.BaseMockitoTestClass;
-import me.alb_i986.junit.ExpectedException;
+import me.alb_i986.junit.SimulatedTestFailure;
 
 import static java.util.Arrays.asList;
 import static me.alb_i986.junit.Descriptions.defaultDescription;
@@ -45,7 +45,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
     @Test
     public void givenZeroTimesRetryRule_failingFlakyTestShouldNotBeRetried() throws Throwable {
         // given a failing statement
-        willThrow(new ExpectedException("simulated test failure"))
+        willThrow(new SimulatedTestFailure())
                 .given(mockedStatement).evaluate();
 
         RetryRule sut = new RetryRule(0);
@@ -55,7 +55,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
             sut.apply(mockedStatement, descriptionForFlakyTest())
                     .evaluate();
             fail("the statement was supposed to fail");
-        } catch (ExpectedException e) {
+        } catch (SimulatedTestFailure e) {
             // expected
         }
 
@@ -65,7 +65,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
     @Test
     public void givenZeroTimesRetryRule_failingNonFlakyTestShouldNotBeRetried() throws Throwable {
         // given a failing statement
-        willThrow(new ExpectedException("simulated test failure"))
+        willThrow(new SimulatedTestFailure())
                 .given(mockedStatement).evaluate();
 
         RetryRule sut = new RetryRule(0);
@@ -75,7 +75,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
             sut.apply(mockedStatement, defaultDescription())
                     .evaluate();
             fail("the statement was supposed to fail");
-        } catch (ExpectedException e) {
+        } catch (SimulatedTestFailure e) {
             // expected
         }
 
@@ -83,7 +83,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
     }
 
     @Test
-    public void givenZeroTimesRetryRule_passingTestShouldNotBeRetried() throws Throwable {
+    public void givenZeroTimesRetryRule_passingFlakyTestShouldNotBeRetried() throws Throwable {
         RetryRule sut = new RetryRule(0);
 
         // when
@@ -96,7 +96,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
     @Test
     public void nonFlakyTestsShouldNotBeRetried() throws Throwable {
         // given a failing statement
-        willThrow(new ExpectedException("simulated test failure"))
+        willThrow(new SimulatedTestFailure())
                 .given(mockedStatement).evaluate();
 
         RetryRule sut = new RetryRule(2);
@@ -106,7 +106,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
             sut.apply(mockedStatement, defaultDescription())
                     .evaluate();
             fail("the statement was supposed to fail");
-        } catch (ExpectedException e) {
+        } catch (SimulatedTestFailure e) {
             // expected: should propagate the original exception
         }
 
@@ -126,7 +126,7 @@ public class RetryRuleTest extends BaseMockitoTestClass {
 
     @Test
     public void flakyTestsFailingOnlyTheFirstTimeShouldBeRetriedOnlyOnce() throws Throwable {
-        willThrow(new RuntimeException("failure 1"))
+        willThrow(new SimulatedTestFailure())
                 .willNothing() // the test passes from the second time on
                 .given(mockedStatement).evaluate();
 
@@ -140,11 +140,11 @@ public class RetryRuleTest extends BaseMockitoTestClass {
     }
 
     @Test
-    public void shouldThrowRetryExceptionWhenFlakyTestIsFailingAllTheTimes() throws Throwable {
-        willThrow(new RuntimeException("failure 1"))
-                .willThrow(new RuntimeException("failure 2"))
-                .willThrow(new RuntimeException("failure 3"))
-                .willThrow(new RuntimeException("failure N"))
+    public void shouldThrowRetryExceptionWhenFlakyTestFailsAllTheTimes() throws Throwable {
+        willThrow(new SimulatedTestFailure("failure 1"))
+                .willThrow(new SimulatedTestFailure("failure 2"))
+                .willThrow(new SimulatedTestFailure("failure 3"))
+                .willThrow(new SimulatedTestFailure("failure N"))
                 .given(mockedStatement).evaluate();
 
         RetryRule sut = new RetryRule(2);
@@ -244,21 +244,21 @@ public class RetryRuleTest extends BaseMockitoTestClass {
         @Test
         public void nonFlakyAlwaysFailingTest() {
             nonFlakyAlwaysFailingTestRunCount++;
-            throw new RuntimeException("simulated failure for nonFlakyAlwaysFailingTest");
+            throw new SimulatedTestFailure("simulated failure for nonFlakyAlwaysFailingTest");
         }
 
         @Flaky
         @Test
-        public void flakyTestAlwaysFailing() {
+        public void flakyAlwaysFailingTest() {
             flakyAlwaysFailingTestRunCount++;
-            throw new RuntimeException("simulated failure for flakyTestAlwaysFailing");
+            throw new SimulatedTestFailure("simulated failure for flakyAlwaysFailingTest");
         }
 
         @Flaky
         @Test
         public void flakyTestFailingTheFirstTime() {
             if (flakyTestFailingTheFirstTimeRunCount++ == 0) {
-                throw new RuntimeException("simulated failure for flakyTestFailingTheFirstTime");
+                throw new SimulatedTestFailure("simulated failure for flakyTestFailingTheFirstTime");
             }
         }
 
