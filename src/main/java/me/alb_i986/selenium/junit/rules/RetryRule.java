@@ -9,38 +9,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Re-runs a test which fails and is explicitly marked as {@link Flaky} until it passes, for max n times.
+ * A rule which, in case of failure, re-runs a test annotated with {@link Flaky} until it passes,
+ * for max {@code n} times (max {@code n+1} executions in total).
  * <p>
- * {@link Error}s, excluding {@link AssertionError}s, are <i>not</i> caught.
- * Therefore, OOM errors will always be propagated ASAP.
+ * If a test doesn't pass after {@code n+1} executions, a {@link RetryException} is thrown,
+ * containing all of the failures occurred.
  * <p>
- * If a test doesn't pass after the configured number of retry times,
- * a {@link RetryException} is thrown, collecting all of the failures occurred.
- * <p>
- * A test is <i>not</i> retried if:
+ * A test is retried <i>unless</i>:
  * <ul>
- *     <li>the configured retry times is 0 (in which case, the test will be executed only once,
- *     as if there was no {@link RetryRule})</li>
+ *     <li>The configured retry times is 0 (i.e. {@code new RetryRule(0)}),
+ *     in which case the test will be executed only once,
+ *     as if there was no {@link RetryRule} in place</li>
  *     <li>The test throws {@link AssumptionViolatedException}</li>
- *     <li>The test throws an {@link Error}, excluding {@link AssertionError}
- *     (therefore, OOM errors will always be propagated ASAP)</li>
- *     <li>The test is not annotated with {@link Flaky}</li>
+ *     <li>The test throws an {@link Error}, excluding {@link AssertionError},
+ *     so that OOM errors are always propagated ASAP</li>
+ *     <li>The test is <i>not</i> annotated with {@link Flaky}</li>
  * </ul>
  * <p>
- * Examples:
+ * For example, given the following rule:
  * <pre>
- *     &#064;Rule RetryRule retryRule = new RetryRule(2);
+ *     &#064;Rule TestRule retryRule = new RetryRule(1);
  * </pre>
  *
+ * For each test which is run, here's what happens:
  * <ul>
- *     <li>Each test will be run once</li>
- *     <li>If it passes, that's it</li>
- *     <li>If it fails, it will be run once again</li>
- *     <li>If it fails again, a {@link RetryException} will be thrown</li>
+ *     <li>If the first execution is successful, that's it</li>
+ *     <li>If instead the test fails, it will be run once again</li>
+ *     <li>If the second execution is still not successful,
+ *     then a {@link RetryException} will be thrown, with the two test failures occurred attached</li>
  * </ul>
- * A RetryRule with 0 retry times will run tests only once, as if no {@link RetryRule} was in place.
- *
- * TODO finish javadoc
  */
 public class RetryRule implements TestRule {
 
@@ -48,7 +45,7 @@ public class RetryRule implements TestRule {
 
     /**
      * @param retries how many times to retry, <i>after the first attempt</i>.
-     *                Example: {@code new RetryRule(1)} will run a test twice    if it fails.
+     *                For example, {@code new RetryRule(1)} will run a test max 2 times.
      */
     public RetryRule(int retries) {
         if (retries < 0) {
@@ -76,13 +73,13 @@ public class RetryRule implements TestRule {
                     try {
                         base.evaluate();
                         break;
-                    } catch (AssertionError e) { // retry
+                    } catch (AssertionError e) {
                         failures.add(e);
                     } catch (Error error) {
                         throw error;
                     } catch (AssumptionViolatedException e) {
                         throw e;
-                    } catch (Throwable t) { // retry
+                    } catch (Throwable t) {
                         failures.add(t);
                     }
 
