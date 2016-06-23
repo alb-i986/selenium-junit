@@ -32,7 +32,7 @@ public class RetryExceptionTest {
                 new Throwable("failure1"), new Throwable("failure2"));
 
         assertThat(sut.getMessage(), stringContainsInOrder(asList(
-                String.format("Flaky test '%s' failed %d time(s):", defaultDescription(), 2),
+                String.format("Flaky test '%s' failed %d times:", defaultDescription(), 2),
                 "java.lang.Throwable: failure1\n" +
                         "\tat me.alb_i986.selenium.junit.rules.RetryExceptionTest.messageShouldListAllOfTheFailures",
                 "java.lang.Throwable: failure2\n" +
