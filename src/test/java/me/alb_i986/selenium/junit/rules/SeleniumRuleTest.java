@@ -114,11 +114,10 @@ public class SeleniumRuleTest {
 
     public static class RealSeleniumTest {
         @Rule
-        public final SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
+        public final SeleniumRule seleniumRule = new SeleniumRule(new ChromeDriverFactory())
                 .withTestLogger(Logger.getLogger("my.logger"))
                 .toTakeScreenshotOnFailure(OutputType.BASE64)
-                .toRetryOnFailure(1)
-                .build();
+                .toRetryOnFailure(1);
 
         protected final WebDriver driver() {
             return seleniumRule.getDriver();
