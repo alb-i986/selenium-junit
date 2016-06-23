@@ -15,17 +15,14 @@ import me.alb_i986.selenium.WebDriverProvider;
 /**
  * A {@link TestRule} for Selenium tests.
  * <p>
- * Start from {@link #configure(WebDriverFactory)} to build an instance.
- * <p>
  * Example of usage:
  * <pre>
  * public class MySeleniumTest {
  *     &#064;Rule
- *     public final SeleniumRule seleniumRule = SeleniumRule.configure(new ChromeDriverFactory())
+ *     public final SeleniumRule seleniumRule = new SeleniumRule(new ChromeDriverFactory())
  *          .withTestLogger(Logger.getLogger("my.logger"))
  *          .toTakeScreenshotOnFailure(OutputType.BASE64)
- *          .toRetryOnFailure(2) // retry each test max 2 times (max 3 executions in total)
- *          .build();
+ *          .toRetryOnFailure(2); // retry each test max 2 times (max 3 executions in total)
  *
  *     protected final WebDriver driver() {
  *         return seleniumRule.getDriver();
@@ -47,107 +44,81 @@ import me.alb_i986.selenium.WebDriverProvider;
  * }
  * </pre>
  */
-public abstract class SeleniumRule implements TestRule, WebDriverProvider {
+public class SeleniumRule implements TestRule, WebDriverProvider {
 
-    private final RuleChain ruleChain;
+    private final WebDriverResource driverResource;
+    private TakeScreenshotOnFailureRule screenshotOnFailure;
+    private TestLoggerOnStartRule testLoggerOnStart;
+    private TestLoggerOnFinishRule testLoggerOnFinish;
+    private RetryRule retryRule;
 
     /**
-     * Gives access to a fluent configuration API (a Builder),
-     * which allows to build a {@link SeleniumRule} as per your needs.
-     *
      * @param factory the factory to use to create {@link WebDriver} instances before a test starts
      */
-    public static Builder configure(WebDriverFactory factory) {
-        return new Builder(factory);
+    public SeleniumRule(WebDriverFactory factory) {
+        this(new WebDriverResource(factory));
     }
 
-    /**
-     * Please use {@link #configure(WebDriverFactory)} instead, to instantiate.
-     */
-    protected SeleniumRule(RuleChain ruleChain) {
-        if (ruleChain == null) {
-            throw new IllegalArgumentException("RuleChain should not be null");
-        }
-        this.ruleChain = ruleChain;
+    protected SeleniumRule(WebDriverResource driverResource) {
+        this.driverResource = driverResource;
+    }
+
+    public SeleniumRule withTestLogger(Logger logger) {
+        withTestLoggerOnStart(new TestLoggerOnStartRule(logger));
+        withTestLoggerOnFinish(new TestLoggerOnFinishRule(logger));
+        return this;
+    }
+
+    protected SeleniumRule withTestLoggerOnStart(TestLoggerOnStartRule testLoggerOnStart) {
+        this.testLoggerOnStart = testLoggerOnStart;
+        return this;
+    }
+
+    protected SeleniumRule withTestLoggerOnFinish(TestLoggerOnFinishRule testLoggerOnFinish) {
+        this.testLoggerOnFinish = testLoggerOnFinish;
+        return this;
+    }
+
+    public <X> SeleniumRule toTakeScreenshotOnFailure(OutputType<X> outputType) {
+        return toTakeScreenshotOnFailure(new TakeScreenshotOnFailureRule(driverResource, outputType));
+    }
+
+    protected <X> SeleniumRule toTakeScreenshotOnFailure(TakeScreenshotOnFailureRule<X> takeScreenshotOnFailureRule) {
+        this.screenshotOnFailure = takeScreenshotOnFailureRule;
+        return this;
+    }
+
+    public SeleniumRule toRetryOnFailure(int retryTimes) {
+        return toRetryOnFailure(new RetryRule(retryTimes));
+    }
+
+    protected SeleniumRule toRetryOnFailure(RetryRule retryRule) {
+        this.retryRule = retryRule;
+        return this;
     }
 
     @Override
     public Statement apply(Statement base, Description description) {
-        return ruleChain.apply(base, description);
+        RuleChainBuilder chainBuilder = new RuleChainBuilder();
+        if (retryRule != null) {
+            chainBuilder.append(retryRule);
+        }
+        if (testLoggerOnStart != null) {
+            chainBuilder.append(testLoggerOnStart);
+        }
+        chainBuilder.append(driverResource);
+        if (screenshotOnFailure != null) {
+            chainBuilder.append(screenshotOnFailure);
+        }
+        if (testLoggerOnFinish != null) {
+            chainBuilder.append(testLoggerOnFinish);
+        }
+        return chainBuilder.build().apply(base, description);
     }
 
-    public static class Builder {
-
-        private final WebDriverResource driverResource;
-        private TakeScreenshotOnFailureRule screenshotOnFailure;
-        private TestLoggerOnStartRule testLoggerOnStart;
-        private TestLoggerOnFinishRule testLoggerOnFinish;
-        private RetryRule retryRule;
-
-        protected Builder(WebDriverFactory factory) {
-            this(new WebDriverResource(factory));
-        }
-
-        protected Builder(WebDriverResource driverResource) {
-            this.driverResource = driverResource;
-        }
-
-        public Builder withTestLogger(Logger logger) {
-            withTestLoggerOnStart(new TestLoggerOnStartRule(logger));
-            withTestLoggerOnFinish(new TestLoggerOnFinishRule(logger));
-            return this;
-        }
-
-        protected Builder withTestLoggerOnStart(TestLoggerOnStartRule testLoggerOnStart) {
-            this.testLoggerOnStart = testLoggerOnStart;
-            return this;
-        }
-
-        protected Builder withTestLoggerOnFinish(TestLoggerOnFinishRule testLoggerOnFinish) {
-            this.testLoggerOnFinish = testLoggerOnFinish;
-            return this;
-        }
-
-        public <X> Builder toTakeScreenshotOnFailure(OutputType<X> outputType) {
-            return toTakeScreenshotOnFailure(new TakeScreenshotOnFailureRule(driverResource, outputType));
-        }
-
-        protected <X> Builder toTakeScreenshotOnFailure(TakeScreenshotOnFailureRule<X> takeScreenshotOnFailureRule) {
-            this.screenshotOnFailure = takeScreenshotOnFailureRule;
-            return this;
-        }
-
-        public Builder toRetryOnFailure(int retryTimes) {
-            return toRetryOnFailure(new RetryRule(retryTimes));
-        }
-
-        protected Builder toRetryOnFailure(RetryRule retryRule) {
-            this.retryRule = retryRule;
-            return this;
-        }
-
-        public SeleniumRule build() {
-            RuleChainBuilder chainBuilder = new RuleChainBuilder();
-            if (retryRule != null) {
-                chainBuilder.append(retryRule);
-            }
-            if (testLoggerOnStart != null) {
-                chainBuilder.append(testLoggerOnStart);
-            }
-            chainBuilder.append(driverResource);
-            if (screenshotOnFailure != null) {
-                chainBuilder.append(screenshotOnFailure);
-            }
-            if (testLoggerOnFinish != null) {
-                chainBuilder.append(testLoggerOnFinish);
-            }
-            return new SeleniumRule(chainBuilder.build()) {
-                @Override
-                public WebDriver getDriver() {
-                    return driverResource.getDriver();
-                }
-            };
-        }
+    @Override
+    public WebDriver getDriver() {
+        return driverResource.getDriver();
     }
 
     private static class RuleChainBuilder {

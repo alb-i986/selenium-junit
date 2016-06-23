@@ -35,12 +35,11 @@ public class SeleniumRuleTest {
         WebDriverResource driverResource = spy(new WebDriverResource(new MockedDriverFactory()));
         RetryRule retryRule = spy(new RetryRule(1));
 
-        SeleniumRule sut = new SeleniumRule.Builder(driverResource)
+        SeleniumRule sut = new SeleniumRule(driverResource)
                 .withTestLoggerOnStart(testLoggerOnStart)
                 .withTestLoggerOnFinish(testLoggerOnFinish)
                 .toTakeScreenshotOnFailure(screenshotOnFailure)
-                .toRetryOnFailure(retryRule)
-                .build();
+                .toRetryOnFailure(retryRule);
 
         // given a failing test
         SimulatedTestFailure exception = new SimulatedTestFailure("simulated test failure (expected)");
@@ -88,9 +87,8 @@ public class SeleniumRuleTest {
 
     public static class TestClassWithMinimalSeleniumRuleChain {
         @Rule
-        public SeleniumRule seleniumRule = SeleniumRule.configure(new MockedDriverFactory())
-                .withTestLogger(Logger.getLogger("asd"))
-                .build();
+        public SeleniumRule seleniumRule = new SeleniumRule(new MockedDriverFactory())
+                .withTestLogger(Logger.getLogger("asd"));
 
         protected WebDriver driver() {
             return seleniumRule.getDriver();
