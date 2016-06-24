@@ -1,29 +1,27 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.BaseMockitoTestClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.openqa.selenium.remote.service.DriverService;
 
-import java.io.IOException;
+import me.alb_i986.BaseMockitoTestClass;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.mock;
 import static org.mockito.BDDMockito.verify;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.inOrder;
 
 public class DriverServiceResourceTest extends BaseMockitoTestClass {
 
     @Mock private DriverService mockedService;
 
     @Test
-    public void nullDriverServiceShouldNotBeAllowed() {
+    public void instantiationShouldFailWhenDriverIsNull() {
         try {
             new DriverServiceResource(null);
             fail("null DriverService should not be allowed");
@@ -44,7 +42,7 @@ public class DriverServiceResourceTest extends BaseMockitoTestClass {
     }
 
     @Test
-    public void afterShouldStopTheService() throws Exception {
+    public void afterShouldStopTheService() {
         DriverServiceResource sut = new DriverServiceResource(mockedService);
 
         // when
@@ -54,12 +52,13 @@ public class DriverServiceResourceTest extends BaseMockitoTestClass {
     }
 
     @Test
-    public void integrationTest() throws IOException {
+    public void integrationTest() throws Exception {
         Result result = JUnitCore.runClasses(TestClassWithDriverServiceResourceRule.class);
 
-        assertTrue(result.wasSuccessful());
-        verify(TestClassWithDriverServiceResourceRule.MOCKED_DRIVER_SERVICE).start();
-        verify(TestClassWithDriverServiceResourceRule.MOCKED_DRIVER_SERVICE).stop();
+        assertThat(result.getFailures(), is(empty()));
+        InOrder inOrder = inOrder(TestClassWithDriverServiceResourceRule.MOCKED_DRIVER_SERVICE);
+        inOrder.verify(TestClassWithDriverServiceResourceRule.MOCKED_DRIVER_SERVICE).start();
+        inOrder.verify(TestClassWithDriverServiceResourceRule.MOCKED_DRIVER_SERVICE).stop();
         assertThat(result.getRunCount(), equalTo(2));
     }
 

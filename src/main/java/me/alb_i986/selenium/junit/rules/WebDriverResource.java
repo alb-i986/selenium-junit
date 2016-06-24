@@ -1,15 +1,18 @@
 package me.alb_i986.selenium.junit.rules;
 
-import me.alb_i986.selenium.WebDriverFactory;
 import org.junit.rules.ExternalResource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+
+import me.alb_i986.selenium.WebDriverFactory;
+import me.alb_i986.selenium.WebDriverProvider;
 
 /**
  * A {@link org.junit.rules.TestRule} managing {@link WebDriver} instances during testruns,
  * i.e. opening and closing real browsers.
  * <p>
- * Before a test starts, a new {@link WebDriver} is created. The actual creation of the driver is delegated to a {@link WebDriverFactory}.
+ * Before a test starts, a new driver is created.
+ * The actual creation of the driver is delegated to the configured {@link WebDriverFactory}.
  * After a test terminates, the driver is quit.
  * <p>
  * Not thread safe. This shouldn't be an issue, as long as every test gets a new instance of the rule.
@@ -22,19 +25,10 @@ import org.openqa.selenium.WebDriverException;
  * }
  * </pre>
  */
-public class WebDriverResource extends ExternalResource {
+public class WebDriverResource extends ExternalResource implements WebDriverProvider {
 
     private final WebDriverFactory driverFactory;
     private WebDriver driver;
-
-    public WebDriverResource(final WebDriver driver) {
-        this(new WebDriverFactory() {
-            @Override
-            public WebDriver create() {
-                return driver;
-            }
-        });
-    }
 
     public WebDriverResource(WebDriverFactory driverFactory) {
         if (driverFactory == null) {
@@ -66,16 +60,24 @@ public class WebDriverResource extends ExternalResource {
      * @see WebDriver#quit()
      */
     @Override
-    public void after() {
+    protected void after() {
         driver.quit();
     }
 
+    /**
+     * @throws IllegalStateException if the driver has not been initialized yet,
+     * which means that before() hasn't been called.
+     */
+    @Override
     public WebDriver getDriver() {
+        if (driver == null) {
+            throw new IllegalStateException("Looks like the driver has not been initialized yet.");
+        }
         return driver;
     }
 
     /**
-     * To be used by unit tests only!
+     * <b>Warning</b>: to be used by unit tests only!
      */
     void setDriver(WebDriver driver) {
         this.driver = driver;
