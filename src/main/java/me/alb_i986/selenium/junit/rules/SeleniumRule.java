@@ -29,6 +29,7 @@ import me.alb_i986.selenium.WebDriverProvider;
  *     }
  *
  *     &#064;Test
+ *     &#064;Flaky // without this, the test will not be re-tried in case of failure
  *     public void myTest() {
  *         driver().get("http://www.google.com");
  *         driver().findElement(By.name("q")).sendKeys("selenium-junit" + Keys.ENTER);
