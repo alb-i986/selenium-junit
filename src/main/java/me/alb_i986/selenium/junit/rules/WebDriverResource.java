@@ -77,7 +77,7 @@ public class WebDriverResource extends ExternalResource implements WebDriverProv
 
     /**
      * @throws IllegalStateException if the driver has not been initialized yet,
-     * which means that before() hasn't been called.
+     * which means that {@code before()} hasn't been called.
      */
     @Override
     public WebDriver getDriver() {

@@ -155,8 +155,8 @@ public class RetryRuleTest extends BaseMockitoTestClass {
                     .evaluate();
             fail("should throw RetryException");
         } catch (RetryException e) { // expected
-            assertThat(e.getMessage(), stringContainsInOrder(asList(
-                    "failure 1", "failure 2", "failure 3")));
+            assertThat(e.getMessage(), stringContainsInOrder(
+                    asList("failure 1", "failure 2", "failure 3")));
         }
 
         verify(mockedStatement, times(3)).evaluate();
