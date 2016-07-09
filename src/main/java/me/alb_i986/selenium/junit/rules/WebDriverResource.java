@@ -4,6 +4,9 @@ import org.junit.rules.ExternalResource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import me.alb_i986.selenium.WebDriverFactory;
 import me.alb_i986.selenium.WebDriverProvider;
 
@@ -26,6 +29,8 @@ import me.alb_i986.selenium.WebDriverProvider;
  * </pre>
  */
 public class WebDriverResource extends ExternalResource implements WebDriverProvider {
+
+    private static final Logger LOGGER = Logger.getLogger(WebDriverResource.class.getName());
 
     private final WebDriverFactory driverFactory;
     private WebDriver driver;
@@ -56,12 +61,18 @@ public class WebDriverResource extends ExternalResource implements WebDriverProv
 
     /**
      * Quits the driver.
+     * <p>
+     * Any {@link WebDriverException} thrown is caught and logged.
      *
      * @see WebDriver#quit()
      */
     @Override
     protected void after() {
-        driver.quit();
+        try {
+            driver.quit();
+        } catch (WebDriverException e) {
+            LOGGER.log(Level.WARNING, "Quitting driver failed", e);
+        }
     }
 
     /**
